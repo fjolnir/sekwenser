@@ -1,0 +1,421 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1DDD58140DA1D0A300B32029 /* MainMenu.xib */; };
+		256AC3DA0F4B6AC300CF3369 /* SekwenserAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 256AC3D90F4B6AC300CF3369 /* SekwenserAppDelegate.m */; };
+		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
+		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
+		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		C7D041CF1260718100503FD6 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D041CE1260718100503FD6 /* CoreMIDI.framework */; };
+		C7D041D11260718B00503FD6 /* SnoizeMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */; };
+		C7D041FB126071CF00503FD6 /* SnoizeMIDI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */; };
+		C7D0421B1260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D042161260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m */; };
+		C7D0421C1260725600503FD6 /* SSECombinationOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D042181260725600503FD6 /* SSECombinationOutputStream.m */; };
+		C7D0421D1260725600503FD6 /* SSEOutputStreamDestination.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D0421A1260725600503FD6 /* SSEOutputStreamDestination.m */; };
+		C7D043371260886F00503FD6 /* PSSequencer.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D043361260886F00503FD6 /* PSSequencer.m */; };
+		C7D0433C126088B000503FD6 /* PSPattern.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D0433B126088B000503FD6 /* PSPattern.m */; };
+		C7D04341126088B600503FD6 /* PSStep.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04340126088B600503FD6 /* PSStep.m */; };
+		C7D0434C1260897B00503FD6 /* PSPatternSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D0434B1260897B00503FD6 /* PSPatternSet.m */; };
+		C7D043C4126094C500503FD6 /* PadKontrolConstants.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D043C3126094C500503FD6 /* PadKontrolConstants.c */; };
+		C7D0445D1260A5EA00503FD6 /* BWToolkitFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */; };
+		C7D044601260A5F200503FD6 /* BWToolkitFramework.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */; };
+		C7D046AF1260E7E900503FD6 /* PSClock.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D046AE1260E7E900503FD6 /* PSClock.m */; };
+		C7D048C91261AAEC00503FD6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */; };
+		C7D04D6012623CED00503FD6 /* PSPadKontrol.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04D5F12623CED00503FD6 /* PSPadKontrol.m */; };
+		C7D04ED412633BDE00503FD6 /* PSPadKontrolEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04ED312633BDE00503FD6 /* PSPadKontrolEvent.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C7D041FA126071C200503FD6 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				C7D044601260A5F200503FD6 /* BWToolkitFramework.framework in Copy Frameworks */,
+				C7D041FB126071CF00503FD6 /* SnoizeMIDI.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		089C165DFE840E0CC02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
+		1DDD58150DA1D0A300B32029 /* English */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = English; path = English.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		256AC3D80F4B6AC300CF3369 /* SekwenserAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SekwenserAppDelegate.h; sourceTree = "<group>"; };
+		256AC3D90F4B6AC300CF3369 /* SekwenserAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SekwenserAppDelegate.m; sourceTree = "<group>"; };
+		256AC3F00F4B6AF500CF3369 /* Sekwenser_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Sekwenser_Prefix.pch; sourceTree = "<group>"; };
+		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
+		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
+		8D1107310486CEB800E47090 /* Sekwenser-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Sekwenser-Info.plist"; sourceTree = "<group>"; };
+		8D1107320486CEB800E47090 /* sekwenser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sekwenser.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C7D041CE1260718100503FD6 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
+		C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SnoizeMIDI.framework; sourceTree = "<group>"; };
+		C7D042131260725600503FD6 /* PadKontrolConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PadKontrolConstants.h; sourceTree = "<group>"; };
+		C7D042151260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SMDestinationEndpoint-SSEOutputStreamDestination.h"; sourceTree = "<group>"; };
+		C7D042161260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SMDestinationEndpoint-SSEOutputStreamDestination.m"; sourceTree = "<group>"; };
+		C7D042171260725600503FD6 /* SSECombinationOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSECombinationOutputStream.h; sourceTree = "<group>"; };
+		C7D042181260725600503FD6 /* SSECombinationOutputStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSECombinationOutputStream.m; sourceTree = "<group>"; };
+		C7D042191260725600503FD6 /* SSEOutputStreamDestination.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSEOutputStreamDestination.h; sourceTree = "<group>"; };
+		C7D0421A1260725600503FD6 /* SSEOutputStreamDestination.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSEOutputStreamDestination.m; sourceTree = "<group>"; };
+		C7D043351260886F00503FD6 /* PSSequencer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSSequencer.h; sourceTree = "<group>"; };
+		C7D043361260886F00503FD6 /* PSSequencer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSSequencer.m; sourceTree = "<group>"; };
+		C7D0433A126088B000503FD6 /* PSPattern.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPattern.h; sourceTree = "<group>"; };
+		C7D0433B126088B000503FD6 /* PSPattern.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPattern.m; sourceTree = "<group>"; };
+		C7D0433F126088B600503FD6 /* PSStep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSStep.h; sourceTree = "<group>"; };
+		C7D04340126088B600503FD6 /* PSStep.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSStep.m; sourceTree = "<group>"; };
+		C7D0434A1260897B00503FD6 /* PSPatternSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPatternSet.h; sourceTree = "<group>"; };
+		C7D0434B1260897B00503FD6 /* PSPatternSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPatternSet.m; sourceTree = "<group>"; };
+		C7D043C3126094C500503FD6 /* PadKontrolConstants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PadKontrolConstants.c; sourceTree = "<group>"; };
+		C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BWToolkitFramework.framework; path = /Users/fyolnish/Library/Frameworks/BWToolkitFramework.framework; sourceTree = "<absolute>"; };
+		C7D046AD1260E7E900503FD6 /* PSClock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSClock.h; sourceTree = "<group>"; };
+		C7D046AE1260E7E900503FD6 /* PSClock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSClock.m; sourceTree = "<group>"; };
+		C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		C7D04CCF1262326400503FD6 /* PSClockListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSClockListener.h; sourceTree = "<group>"; };
+		C7D04D5E12623CED00503FD6 /* PSPadKontrol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PSPadKontrol.h; path = Sequencer/PSPadKontrol.h; sourceTree = "<group>"; };
+		C7D04D5F12623CED00503FD6 /* PSPadKontrol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PSPadKontrol.m; path = Sequencer/PSPadKontrol.m; sourceTree = "<group>"; };
+		C7D04ED212633BDE00503FD6 /* PSPadKontrolEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadKontrolEvent.h; sourceTree = "<group>"; };
+		C7D04ED312633BDE00503FD6 /* PSPadKontrolEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPadKontrolEvent.m; sourceTree = "<group>"; };
+		C7D04F451263495000503FD6 /* PSPadKontrolEventListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadKontrolEventListener.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D11072E0486CEB800E47090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
+				C7D041CF1260718100503FD6 /* CoreMIDI.framework in Frameworks */,
+				C7D041D11260718B00503FD6 /* SnoizeMIDI.framework in Frameworks */,
+				C7D0445D1260A5EA00503FD6 /* BWToolkitFramework.framework in Frameworks */,
+				C7D048C91261AAEC00503FD6 /* AudioToolbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */,
+				C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */,
+				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
+			);
+			name = "Linked Frameworks";
+			sourceTree = "<group>";
+		};
+		1058C7A2FEA54F0111CA2CBB /* Other Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29B97324FDCFA39411CA2CEA /* AppKit.framework */,
+				13E42FB307B3F0F600E4EEF1 /* CoreData.framework */,
+				29B97325FDCFA39411CA2CEA /* Foundation.framework */,
+			);
+			name = "Other Frameworks";
+			sourceTree = "<group>";
+		};
+		19C28FACFE9D520D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107320486CEB800E47090 /* sekwenser.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		29B97314FDCFA39411CA2CEA /* Meedee */ = {
+			isa = PBXGroup;
+			children = (
+				C7D042121260725600503FD6 /* Source */,
+				29B97315FDCFA39411CA2CEA /* Other Sources */,
+				29B97317FDCFA39411CA2CEA /* Resources */,
+				29B97323FDCFA39411CA2CEA /* Frameworks */,
+				19C28FACFE9D520D11CA2CBB /* Products */,
+			);
+			name = Meedee;
+			sourceTree = "<group>";
+		};
+		29B97315FDCFA39411CA2CEA /* Other Sources */ = {
+			isa = PBXGroup;
+			children = (
+				256AC3F00F4B6AF500CF3369 /* Sekwenser_Prefix.pch */,
+				29B97316FDCFA39411CA2CEA /* main.m */,
+			);
+			name = "Other Sources";
+			sourceTree = "<group>";
+		};
+		29B97317FDCFA39411CA2CEA /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D1107310486CEB800E47090 /* Sekwenser-Info.plist */,
+				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
+				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C7D041CE1260718100503FD6 /* CoreMIDI.framework */,
+				C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */,
+				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
+				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C7D042121260725600503FD6 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				C7D04F451263495000503FD6 /* PSPadKontrolEventListener.h */,
+				256AC3D80F4B6AC300CF3369 /* SekwenserAppDelegate.h */,
+				256AC3D90F4B6AC300CF3369 /* SekwenserAppDelegate.m */,
+				C7D042131260725600503FD6 /* PadKontrolConstants.h */,
+				C7D043C3126094C500503FD6 /* PadKontrolConstants.c */,
+				C7D04D5E12623CED00503FD6 /* PSPadKontrol.h */,
+				C7D04D5F12623CED00503FD6 /* PSPadKontrol.m */,
+				C7D04ED212633BDE00503FD6 /* PSPadKontrolEvent.h */,
+				C7D04ED312633BDE00503FD6 /* PSPadKontrolEvent.m */,
+				C7D043321260826300503FD6 /* Sequencer */,
+				C7D042141260725600503FD6 /* SnoizeMIDI SysEx exts */,
+			);
+			path = Source;
+			sourceTree = "<group>";
+		};
+		C7D042141260725600503FD6 /* SnoizeMIDI SysEx exts */ = {
+			isa = PBXGroup;
+			children = (
+				C7D042151260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.h */,
+				C7D042161260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m */,
+				C7D042171260725600503FD6 /* SSECombinationOutputStream.h */,
+				C7D042181260725600503FD6 /* SSECombinationOutputStream.m */,
+				C7D042191260725600503FD6 /* SSEOutputStreamDestination.h */,
+				C7D0421A1260725600503FD6 /* SSEOutputStreamDestination.m */,
+			);
+			path = "SnoizeMIDI SysEx exts";
+			sourceTree = "<group>";
+		};
+		C7D043321260826300503FD6 /* Sequencer */ = {
+			isa = PBXGroup;
+			children = (
+				C7D04CCF1262326400503FD6 /* PSClockListener.h */,
+				C7D046AD1260E7E900503FD6 /* PSClock.h */,
+				C7D046AE1260E7E900503FD6 /* PSClock.m */,
+				C7D043351260886F00503FD6 /* PSSequencer.h */,
+				C7D043361260886F00503FD6 /* PSSequencer.m */,
+				C7D0434A1260897B00503FD6 /* PSPatternSet.h */,
+				C7D0434B1260897B00503FD6 /* PSPatternSet.m */,
+				C7D0433A126088B000503FD6 /* PSPattern.h */,
+				C7D0433B126088B000503FD6 /* PSPattern.m */,
+				C7D0433F126088B600503FD6 /* PSStep.h */,
+				C7D04340126088B600503FD6 /* PSStep.m */,
+			);
+			path = Sequencer;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D1107260486CEB800E47090 /* sekwenser */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "sekwenser" */;
+			buildPhases = (
+				8D1107290486CEB800E47090 /* Resources */,
+				8D11072C0486CEB800E47090 /* Sources */,
+				8D11072E0486CEB800E47090 /* Frameworks */,
+				C7D041FA126071C200503FD6 /* Copy Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = sekwenser;
+			productInstallPath = "$(HOME)/Applications";
+			productName = Meedee;
+			productReference = 8D1107320486CEB800E47090 /* sekwenser.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		29B97313FDCFA39411CA2CEA /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Sekwenser" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 29B97314FDCFA39411CA2CEA /* Meedee */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8D1107260486CEB800E47090 /* sekwenser */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D1107290486CEB800E47090 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
+				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D11072C0486CEB800E47090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8D11072D0486CEB800E47090 /* main.m in Sources */,
+				256AC3DA0F4B6AC300CF3369 /* SekwenserAppDelegate.m in Sources */,
+				C7D0421B1260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m in Sources */,
+				C7D0421C1260725600503FD6 /* SSECombinationOutputStream.m in Sources */,
+				C7D0421D1260725600503FD6 /* SSEOutputStreamDestination.m in Sources */,
+				C7D043371260886F00503FD6 /* PSSequencer.m in Sources */,
+				C7D0433C126088B000503FD6 /* PSPattern.m in Sources */,
+				C7D04341126088B600503FD6 /* PSStep.m in Sources */,
+				C7D0434C1260897B00503FD6 /* PSPatternSet.m in Sources */,
+				C7D043C4126094C500503FD6 /* PadKontrolConstants.c in Sources */,
+				C7D046AF1260E7E900503FD6 /* PSClock.m in Sources */,
+				C7D04D6012623CED00503FD6 /* PSPadKontrol.m in Sources */,
+				C7D04ED412633BDE00503FD6 /* PSPadKontrolEvent.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				089C165DFE840E0CC02AAC07 /* English */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		1DDD58140DA1D0A300B32029 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1DDD58150DA1D0A300B32029 /* English */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		C01FCF4B08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../Library/Frameworks\"",
+				);
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Sekwenser_Prefix.pch;
+				INFOPLIST_FILE = "Sekwenser-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = sekwenser;
+			};
+			name = Debug;
+		};
+		C01FCF4C08A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)\"",
+					"\"$(SRCROOT)/../../Library/Frameworks\"",
+				);
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = Sekwenser_Prefix.pch;
+				INFOPLIST_FILE = "Sekwenser-Info.plist";
+				INSTALL_PATH = "$(HOME)/Applications";
+				PRODUCT_NAME = sekwenser;
+			};
+			name = Release;
+		};
+		C01FCF4F08A954540054247B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		C01FCF5008A954540054247B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C01FCF4A08A954540054247B /* Build configuration list for PBXNativeTarget "sekwenser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4B08A954540054247B /* Debug */,
+				C01FCF4C08A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Sekwenser" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01FCF4F08A954540054247B /* Debug */,
+				C01FCF5008A954540054247B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 29B97313FDCFA39411CA2CEA /* Project object */;
+}
