@@ -24,7 +24,8 @@ typedef enum
 	PSSequencerPatternSetSelectView = 2,
 	PSSequencerPatternSelectView = 3,
 	PSSequencerStepMuteView = 4,
-	PSSequencerPatternCopyView = 5
+	PSSequencerPatternCopyView = 5,
+	PSSequencerPatternSequencerView = 6
 } PSSequencerView;
 
 @interface PSSequencer : NSObject <SMMessageDestination, PSClockListener, PSPadKontrolEventListener> {	
@@ -58,6 +59,22 @@ typedef enum
 	
 	// Indicates wether the shift button is held (setting button)
 	BOOL shiftButtonHeld;
+	
+	// The pattern sequencer 
+	// A sequencer on top of the sequencer really.
+	// Allows you to specify patterns to play in an order. This is done independently of what pattern you are editing
+	// Using this you could also create a 1 step pattern sequencer,
+	// and then create a new pattern while the pattern sequencer plays pattern
+	BOOL inPatternSetSequencingMode;
+	NSMutableArray *patternSetSequencerSteps;
+	NSUInteger currentPatSetSeqStep;
+	
+	// The pattern sequencer editor view state
+	
+	// If NO the user is meant to select a step to add to the sequencer
+	// If YES he's meant to select a destination position in the sequence
+	BOOL patSetSeqViewPlaceMode;
+	NSUInteger patSetSeq_stepToPlace;
 }
 @property(readwrite, retain) NSMutableArray *patternSets;
 @property(readwrite, retain) PSPatternSet *activePatternSet;
@@ -66,6 +83,12 @@ typedef enum
 @property(readwrite, assign) NSUInteger currentStep;
 
 @property(readwrite, retain) SMVirtualOutputStream *virtualOutputStream;
+
+@property(readwrite, assign) BOOL inPatternSetSequencingMode;
+@property(readwrite, retain) NSMutableArray *patternSetSequencerSteps;
+@property(readwrite, assign) NSUInteger currentPatSetSeqStep;
+@property(readwrite, assign) BOOL patSetSeqViewPlaceMode;
+@property(readwrite, assign) NSUInteger patSetSeq_stepToPlace;
 
 + (PSSequencer *)sharedSequencer;
 

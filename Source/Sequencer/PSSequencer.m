@@ -31,7 +31,7 @@ static PSSequencer *sharedSequencer = nil;
 #pragma mark -
 
 @implementation PSSequencer
-@synthesize patternSets, numberOfSteps, activePatternSet, virtualOutputStream, currentStep;
+@synthesize patternSets, numberOfSteps, activePatternSet, virtualOutputStream, currentStep, inPatternSetSequencingMode, patternSetSequencerSteps, currentPatSetSeqStep, patSetSeqViewPlaceMode, patSetSeq_stepToPlace;
 
 + (PSSequencer *)sharedSequencer
 {
@@ -51,6 +51,8 @@ static PSSequencer *sharedSequencer = nil;
 	activeView = PSSequencerSequencerView;
 	velocityEnabled = NO;
 	isModal = NO;
+	
+	self.patternSetSequencerSteps = [NSMutableArray array];
 
 	// Create the patterns
 	self.patternSets = [NSMutableArray array];
@@ -86,9 +88,22 @@ static PSSequencer *sharedSequencer = nil;
 {	
 	NSMutableArray *midiMessages = [NSMutableArray array];
 	
+	PSPatternSet *patternSet = activePatternSet;
+	// If in pattern set sequencing mode we play the currently active pattern set
+	if(inPatternSetSequencingMode)
+	{
+		NSNumber *setIndex;
+		if(currentPatSetSeqStep < [patternSetSequencerSteps count])
+		{
+			setIndex = [patternSetSequencerSteps objectAtIndex:currentPatSetSeqStep];
+			patternSet = [patternSets objectAtIndex:[setIndex intValue]];
+		}
+		else
+			return; // nothing to play
+	}
 	
 	Byte noteData[2] = {0x00, 0x00};
-	for(PSPattern *pattern in activePatternSet.patterns)
+	for(PSPattern *pattern in patternSet.patterns)
 	{
 		// Turn off active notes
 		for(PSStep *step in pattern.steps)
@@ -132,10 +147,18 @@ static PSSequencer *sharedSequencer = nil;
 		uint8_t lightState = kPad_shortOneshot_code+0x02; // add 2 to make the flash slightly longer
 		[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode state:&lightState];
 	}
+	else if(activeView == PSSequencerPatternSequencerView && inPatternSetSequencingMode)
+	{
+		[self updateLights];
+	}
 	
 	// Increment the step
 	if(++currentStep > 15)
+	{
 		currentStep = 0;
+		if(++currentPatSetSeqStep >= [patternSetSequencerSteps count])
+			currentPatSetSeqStep = 0;
+	}
 }
 
 - (void)selectView:(PSSequencerView)view
@@ -216,7 +239,33 @@ static PSSequencer *sharedSequencer = nil;
 																								state:(uint8_t *)&kPad_shortOneshot_code];
 				performingCopy = NO;
 			}
-
+		}
+		else if(activeView == PSSequencerPatternSequencerView)
+		{
+			NSUInteger index = event.affectedPad;
+			
+			if(shiftButtonHeld)
+			{
+				if(index < [patternSetSequencerSteps count])
+				{
+					if(index == [patternSetSequencerSteps count]);
+						 currentPatSetSeqStep = 0;
+					[patternSetSequencerSteps removeObjectAtIndex:index];
+				}
+				patSetSeqViewPlaceMode = NO;
+			}
+			if(self.patSetSeqViewPlaceMode)
+			{
+				if(index < [patternSetSequencerSteps count])
+					[patternSetSequencerSteps replaceObjectAtIndex:index withObject:[NSNumber numberWithInt:self.patSetSeq_stepToPlace]];
+				else if(index == [patternSetSequencerSteps count])
+					[patternSetSequencerSteps addObject:[NSNumber numberWithInt:self.patSetSeq_stepToPlace]];
+			}
+			else
+				self.patSetSeq_stepToPlace = index;
+			self.patSetSeqViewPlaceMode = !self.patSetSeqViewPlaceMode;
+			
+			updateLights = YES;
 		}
 		
 		if(updateLights) [self updateLights];
@@ -229,6 +278,7 @@ static PSSequencer *sharedSequencer = nil;
 		{
 			[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
 			shiftButtonHeld = YES;
+			[self updateLights];
 		}
 		
 		if(!isModal && !shiftButtonHeld)
@@ -245,6 +295,11 @@ static PSSequencer *sharedSequencer = nil;
 			else if(button_code == kMessageBtn_code)
 			{
 				[self selectView:PSSequencerPatternSetSelectView];
+				isModal = YES;
+			}
+			else if(button_code == kHoldBtn_code)
+			{
+				[self selectView:PSSequencerPatternSequencerView];
 				isModal = YES;
 			}
 			else if(button_code == kFlamBtn_code)
@@ -313,12 +368,16 @@ static PSSequencer *sharedSequencer = nil;
 		[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOff_code];
 		
 		if(button_code == kSettingBtn_code)
+		{
 			shiftButtonHeld = NO;
+			[self updateLights];
+		}
 		// Return to sequencer mode
 		else if((button_code == kSceneBtn_code  && activeView == PSSequencerPatternSelectView)
 			 ||  (button_code == kFlamBtn_code    && activeView == PSSequencerStepMuteView)
 			 ||  (button_code == kMessageBtn_code && activeView == PSSequencerPatternSetSelectView)
-			 ||  (button_code == kRollBtn_code    && activeView == PSSequencerPatternCopyView))
+			 ||  (button_code == kRollBtn_code    && activeView == PSSequencerPatternCopyView)
+			 ||  (button_code == kHoldBtn_code    && activeView == PSSequencerPatternSequencerView))
 		{
 			[self selectView:PSSequencerSequencerView];
 			isModal = NO;
@@ -337,6 +396,14 @@ static PSSequencer *sharedSequencer = nil;
 		else if(button_code == kFixedVelBtn_code)
 		{
 			velocityEnabled = !velocityEnabled;
+			[self updateLights];
+		}
+		else if(button_code == kProgChangeBtn_code)
+		{
+			NSLog(@"toggle seq %d", inPatternSetSequencingMode);
+			// Toggle pattern sequencing mode
+			inPatternSetSequencingMode = !inPatternSetSequencingMode;
+			currentPatSetSeqStep = 0;
 			[self updateLights];
 		}
 		else
@@ -506,10 +573,29 @@ static PSSequencer *sharedSequencer = nil;
 		groupTwo = 0x7f;
 		groupThree |= kMultipleLightGroup[0]| kMultipleLightGroup[1];
 	}
+	else if(activeView == PSSequencerPatternSequencerView)
+	{
+		NSUInteger stepsToLight = 16;
+		if(shiftButtonHeld) // delete view
+			stepsToLight = [self.patternSetSequencerSteps count];
+		else if(self.patSetSeqViewPlaceMode)
+			stepsToLight = [self.patternSetSequencerSteps count] + 1;
+		for(int i = 0; i < stepsToLight; ++i)
+		{
+			if(i < 7)
+				groupOne = groupOne | kMultipleLightGroup[i];
+			else if(i < 14)
+				groupTwo = groupTwo | kMultipleLightGroup[i - 7];
+			else if(i < 16)
+				groupThree = groupThree | kMultipleLightGroup[i - 14];
+		}
+	}
 	
 	// Make sure toggle buttons are correctly lit
 	if(!velocityEnabled)
 		groupFour |= kMultipleLightGroup[4];
+	if(inPatternSetSequencingMode)
+		groupFour |= kMultipleLightGroup[5];
 	
 	// Create the mask and turn on the lights
 	uint8_t *mask;
@@ -520,6 +606,13 @@ static PSSequencer *sharedSequencer = nil;
 																																							 five:&groupFive];
 	[[PSPadKontrol sharedPadKontrol] controlMultipleLights:mask ledMask:NULL];
 	free(mask);
+	
+	if(activeView == PSSequencerPatternSequencerView && inPatternSetSequencingMode)
+	{
+		uint8_t lightCode = kPadOn_codes[currentPatSetSeqStep];
+		uint8_t lightState = kPad_blink_code;
+		[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode state:&lightState];
+	}
 }
 #pragma mark -
 // MIDI interface
