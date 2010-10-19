@@ -53,6 +53,11 @@ typedef enum
 	
 	// For changing notes of patterns
 	BOOL inNoteChangeMode;
+	// For changing channels of patterns
+	BOOL inChannelChangeMode;
+	
+	// Indicates wether the shift button is held (setting button)
+	BOOL shiftButtonHeld;
 }
 @property(readwrite, retain) NSMutableArray *patternSets;
 @property(readwrite, retain) PSPatternSet *activePatternSet;

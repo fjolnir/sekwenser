@@ -146,7 +146,6 @@
 }
 - (IBAction)performDelete:(id)sender
 {
-	NSString *path = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[self.savedLayouts objectAtIndex:[self.layoutListTable selectedRow]]];
 	NSString *trashDir = [NSHomeDirectory() stringByAppendingPathComponent:@".Trash"];
 	
 	[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation

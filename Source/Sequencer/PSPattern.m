@@ -10,11 +10,12 @@
 #import "PSStep.h"
 
 @implementation PSPattern
-@synthesize steps, note, muted;
-+ (PSPattern *)emptyPatternWithNote:(uint8_t)inNote numberOfSteps:(NSUInteger)numberOfSteps
+@synthesize steps, note, channel, muted;
++ (PSPattern *)emptyPatternWithNote:(uint8_t)inNote channel:(uint8_t)inChannel numberOfSteps:(NSUInteger)numberOfSteps
 {
 	PSPattern *ret = [[self alloc] init];
 	ret.note = inNote;
+	ret.channel = inChannel;
 	ret.steps   = [NSMutableArray array];
 	
 	for(int i = 0; i < numberOfSteps; ++i)
@@ -30,6 +31,7 @@
 	copy.steps = [[[NSMutableArray alloc] initWithArray:self.steps copyItems:YES] autorelease];
 	copy.muted = self.muted;
 	copy.note = self.note;
+	copy.channel = self.channel;
 	return copy;
 }
 - (id)initWithCoder:(NSCoder *)coder
@@ -39,6 +41,7 @@
 	
 	self.steps = [coder decodeObjectForKey:@"steps"];
 	self.note = [coder decodeIntForKey:@"note"];
+	self.channel = [coder decodeIntForKey:@"channel"];
 	self.muted = [coder decodeBoolForKey:@"muted"];
 	
 	return self;
@@ -47,6 +50,7 @@
 {
 	[coder encodeObject:self.steps forKey:@"steps"];
 	[coder encodeInt:self.note forKey:@"note"];
+	[coder encodeInt:self.channel forKey:@"channel"];
 	[coder encodeBool:self.muted forKey:@"muted"];
 }
 @end

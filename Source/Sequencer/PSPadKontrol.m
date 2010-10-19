@@ -115,7 +115,9 @@ PSPadKontrol *sharedPadKontrol;
 	memcpy(lightCommand, kPad_lightCommandTemplate_code, sizeof(kPad_lightCommandTemplate_code));
 	memcpy(lightCommand+6, lightIdentifier, 1);
 	memcpy(lightCommand+7, lightState, 1);
+	
 	[self sendSysexCommand:lightCommand size:sizeof(kPad_lightCommandTemplate_code)];
+	
 	free(lightCommand);
 }
 
@@ -154,7 +156,7 @@ PSPadKontrol *sharedPadKontrol;
 																									five:(uint8_t *)maskFive
 
 {
-	uint8_t *mask = calloc(5, sizeof(uint8_t));// Use calloc to get a zeroed mask
+	uint8_t *mask = calloc(5, sizeof(uint8_t)); // Use calloc to get a zeroed mask
 	if(maskOne)
 		memcpy(mask,   maskOne, sizeof(uint8_t));
 	if(maskTwo)

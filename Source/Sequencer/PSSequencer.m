@@ -25,6 +25,7 @@ static PSSequencer *sharedSequencer = nil;
 
 @interface PSSequencer () // Private
 - (void)displayCurrentNoteOnLED;
+- (void)displayCurrentChannelOnLED;
 - (void)transmitCC:(uint8_t)ccNumber channel:(uint8_t)channel value:(uint8_t)value;
 @end
 #pragma mark -
@@ -69,6 +70,7 @@ static PSSequencer *sharedSequencer = nil;
 	// Subscribe to the clock
 	[[[PSClock globalClock] listeners] addObject:self];
 
+	// Initialize the lights on the controller
 	[self updateLights];
 	
 	return self;
@@ -83,42 +85,39 @@ static PSSequencer *sharedSequencer = nil;
 - (void)performStep
 {	
 	NSMutableArray *midiMessages = [NSMutableArray array];
+	
+	
+	Byte noteData[2] = {0x00, 0x00};
 	for(PSPattern *pattern in activePatternSet.patterns)
 	{
-		// Turn off the note for the last step
+		// Turn off active notes
 		for(PSStep *step in pattern.steps)
 		{
-			if(!step.noteOn)
-				continue;
-			// Else we send a noteoff
-			Byte noteData[2] = {pattern.note, 0x00};
-			Byte statusByte = SMVoiceMessageStatusNoteOff;
+			if(!step.noteOn) continue;
+			
+			// Else we send a off message
+			noteData[0] = pattern.note;
+			noteData[1] = 0x00;
 			SMVoiceMessage *message = [SMVoiceMessage voiceMessageWithTimeStamp:SMGetCurrentHostTime()
-																															 statusByte:statusByte 
+																															 statusByte:SMVoiceMessageStatusNoteOff 
 																																		 data:noteData 
 																																	 length:2];
-			[message setChannel:1];
+			[message setChannel:pattern.channel];
 			[midiMessages addObject:message];
 			step.noteOn = NO;
 		}
 		// Send the note  for the active step
 		PSStep *step = [pattern.steps objectAtIndex:currentStep];
 		if(![activePatternSet.mutedSteps containsIndex:currentStep] && step.enabled)
-		{
-			//if(velocityEnabled) after thinking a bit I think it's better to just make the
-			// fixed velocity switch affect the velocity at the pad hit, that way it's easy to
-			// make pattern with most pads at full velocity, and then add inn some softer ones
-			Byte velocity = step.velocity;
-			Byte noteData[2] = {pattern.note, velocity};
-			Byte statusByte = SMVoiceMessageStatusNoteOn;
-			//if(clockCount%12 == 0)
-			//	statusByte = SMVoiceMessageStatusNoteOff;
+		{	
+			noteData[0] = pattern.note;
+			noteData[1] = step.velocity;
 			
 			SMVoiceMessage *message = [SMVoiceMessage voiceMessageWithTimeStamp:SMGetCurrentHostTime()
-																															 statusByte:statusByte 
+																															 statusByte:SMVoiceMessageStatusNoteOn 
 																																		 data:noteData 
 																																	 length:2];
-			[message setChannel:1];
+			[message setChannel:pattern.channel];
 			[midiMessages addObject:message];
 			step.noteOn = YES;
 		}
@@ -130,7 +129,7 @@ static PSSequencer *sharedSequencer = nil;
 	if(activeView == PSSequencerSequencerView)
 	{
 		uint8_t lightCode = kPadOn_codes[currentStep];
-		uint8_t lightState = kPad_shortOneshot_code+0x02;
+		uint8_t lightState = kPad_shortOneshot_code+0x02; // add 2 to make the flash slightly longer
 		[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode state:&lightState];
 	}
 	
@@ -153,7 +152,7 @@ static PSSequencer *sharedSequencer = nil;
 - (void)padKontrolEventReceived:(PSPadKontrolEvent *)event fromPadKontrol:(PSPadKontrol *)padKontrol
 {
 	//NSLog(@"Received event from PadKontrol: %@", event);
-	BOOL updateLights = YES;
+
 	PSPattern *activePattern = [activePatternSet activePattern];
 	if([event type] == PSPadKontrolEnteredNativeMode)
 	{
@@ -163,6 +162,9 @@ static PSSequencer *sharedSequencer = nil;
 	}
 	else if([event type] == PSPadKontrolPadPressEventType)
 	{
+		// If this is positive at the end of the block, the lights on the controller will be refreshed
+		BOOL updateLights = YES;
+		
 		if(activeView == PSSequencerSequencerView)
 		{
 			PSStep *step = [[activePattern steps] objectAtIndex:event.affectedPad];
@@ -193,7 +195,6 @@ static PSSequencer *sharedSequencer = nil;
 			updateLights = NO;
 			if(!performingCopy)
 			{
-				NSLog(@"Flash it");
 				uint8_t lightCode = kPadOn_codes[event.affectedPad];
 				[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode
 																								state:(uint8_t *)&kPad_blink_code];
@@ -217,24 +218,28 @@ static PSSequencer *sharedSequencer = nil;
 			}
 
 		}
-		if(updateLights)
-			[self updateLights];
+		
+		if(updateLights) [self updateLights];
 	}
 	else if([event type] == PSPadKontrolButtonPressEventType)
 	{
 		uint8_t button_code = event.affected_entity_code;
-		// Light the button
-		if(!isModal)
+		
+		if(button_code == kSettingBtn_code)
 		{
 			[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
+			shiftButtonHeld = YES;
+		}
+		
+		if(!isModal && !shiftButtonHeld)
+		{
+			// Light the button
+			[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
+			
+			// Buttons in order of appearance on controller
 			if(button_code == kSceneBtn_code)
 			{
 				[self selectView:PSSequencerPatternSelectView];
-				isModal = YES;
-			}
-			else if(button_code == kHoldBtn_code)
-			{
-				[self selectView:PSSequencerStepMuteView];
 				isModal = YES;
 			}
 			else if(button_code == kMessageBtn_code)
@@ -242,93 +247,125 @@ static PSSequencer *sharedSequencer = nil;
 				[self selectView:PSSequencerPatternSetSelectView];
 				isModal = YES;
 			}
+			else if(button_code == kFlamBtn_code)
+			{
+				[self selectView:PSSequencerStepMuteView];
+				isModal = YES;
+			}
 			else if(button_code == kRollBtn_code)
 			{
 				[self selectView:PSSequencerPatternCopyView];
 				isModal = YES;
 			}
-			else if(button_code == kProgChangeBtn_code)
+			else
+			{
+				// Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
+				uint8_t buttonCh = 5;
+				if(button_code == kXBtn_code)
+					[self transmitCC:16 channel:buttonCh value:127];
+				if(button_code == kYBtn_code)
+					[self transmitCC:17 channel:buttonCh value:127];
+				if(button_code == kPedalBtn_code)
+					[self transmitCC:18 channel:buttonCh value:127];
+				if(button_code == kNoteCCBtn_code)
+					[self transmitCC:19 channel:buttonCh value:127];
+				if(button_code == kMidiCHBtn_code)
+					[self transmitCC:20 channel:buttonCh value:127];
+				if(button_code == kSWTypeBtn_code)
+					[self transmitCC:21 channel:buttonCh value:127];
+				if(button_code == kRelValBtn_code)
+					[self transmitCC:22 channel:buttonCh value:127];
+				if(button_code == kVelocityBtn_code)
+					[self transmitCC:23 channel:buttonCh value:127];
+				if(button_code == kPortBtn_code)
+					[self transmitCC:24 channel:buttonCh value:127];
+				if(button_code == kKnobAssignOneBtn_code)
+					[self transmitCC:25 channel:buttonCh value:127];
+				if(button_code == kKnobAssignTwoBtn_code)
+					[self transmitCC:26 channel:buttonCh value:127];
+			}			
+		}
+		// Shift mode (less often used functions)
+		// In shift mode we only light the button if it has a function
+		else if(shiftButtonHeld)
+		{
+			if(button_code == kNoteCCBtn_code)
 			{
 				inNoteChangeMode = YES;
 				[self displayCurrentNoteOnLED];
+
+				[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
+			}
+			else if(button_code == kMidiCHBtn_code)
+			{
+				inChannelChangeMode = YES;
+				[self displayCurrentChannelOnLED];
+
+				[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
 			}
 		}
-		// Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
-		uint8_t buttonCh = 5;
-		if(button_code == kXBtn_code)
-			[self transmitCC:16 channel:buttonCh value:127];
-		if(button_code == kYBtn_code)
-			[self transmitCC:17 channel:buttonCh value:127];
-		if(button_code == kPedalBtn_code)
-			[self transmitCC:18 channel:buttonCh value:127];
-		if(button_code == kNoteCCBtn_code)
-			[self transmitCC:19 channel:buttonCh value:127];
-		if(button_code == kMidiCHBtn_code)
-			[self transmitCC:20 channel:buttonCh value:127];
-		if(button_code == kSWTypeBtn_code)
-			[self transmitCC:21 channel:buttonCh value:127];
-		if(button_code == kRelValBtn_code)
-			[self transmitCC:22 channel:buttonCh value:127];
-		if(button_code == kVelocityBtn_code)
-			[self transmitCC:23 channel:buttonCh value:127];
-		if(button_code == kPortBtn_code)
-			[self transmitCC:24 channel:buttonCh value:127];
-		if(button_code == kKnobAssignOneBtn_code)
-			[self transmitCC:25 channel:buttonCh value:127];
-		if(button_code == kKnobAssignTwoBtn_code)
-			[self transmitCC:26 channel:buttonCh value:127];
 	}
 	else if([event type] == PSPadKontrolButtonReleaseEventType)
 	{
 		uint8_t button_code = event.affected_entity_code;
+		
 		// Turn the button back off
 		[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOff_code];
+		
+		if(button_code == kSettingBtn_code)
+			shiftButtonHeld = NO;
 		// Return to sequencer mode
-		if((button_code == kSceneBtn_code      && activeView == PSSequencerPatternSelectView)
-			 || (button_code == kHoldBtn_code    && activeView == PSSequencerStepMuteView)
-			 || (button_code == kMessageBtn_code && activeView == PSSequencerPatternSetSelectView)
-			 || (button_code == kRollBtn_code    && activeView == PSSequencerPatternCopyView))
+		else if((button_code == kSceneBtn_code  && activeView == PSSequencerPatternSelectView)
+			 ||  (button_code == kFlamBtn_code    && activeView == PSSequencerStepMuteView)
+			 ||  (button_code == kMessageBtn_code && activeView == PSSequencerPatternSetSelectView)
+			 ||  (button_code == kRollBtn_code    && activeView == PSSequencerPatternCopyView))
 		{
 			[self selectView:PSSequencerSequencerView];
 			isModal = NO;
 			performingCopy = NO;
 		}
-		else if(button_code == kFixedVelBtn_code)
-		{
-			NSLog(@"toggling velocity");
-			velocityEnabled = !velocityEnabled;
-			[self updateLights];
-		}
-		else if(button_code == kProgChangeBtn_code)
+		else if(button_code == kNoteCCBtn_code)
 		{
 			inNoteChangeMode = NO;
 			[[PSPadKontrol sharedPadKontrol] clearLED];
 		}
-		
-		// Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
-		uint8_t buttonCh = 5;
-		if(button_code == kXBtn_code)
-			[self transmitCC:16 channel:buttonCh value:0];
-		if(button_code == kYBtn_code)
-			[self transmitCC:17 channel:buttonCh value:0];
-		if(button_code == kPedalBtn_code)
-			[self transmitCC:18 channel:buttonCh value:0];
-		if(button_code == kNoteCCBtn_code)
-			[self transmitCC:19 channel:buttonCh value:0];
-		if(button_code == kMidiCHBtn_code)
-			[self transmitCC:20 channel:buttonCh value:0];
-		if(button_code == kSWTypeBtn_code)
-			[self transmitCC:21 channel:buttonCh value:0];
-		if(button_code == kRelValBtn_code)
-			[self transmitCC:22 channel:buttonCh value:0];
-		if(button_code == kVelocityBtn_code)
-			[self transmitCC:23 channel:buttonCh value:0];
-		if(button_code == kPortBtn_code)
-			[self transmitCC:24 channel:buttonCh value:0];
-		if(button_code == kKnobAssignOneBtn_code)
-			[self transmitCC:25 channel:buttonCh value:0];
-		if(button_code == kKnobAssignTwoBtn_code)
-			[self transmitCC:26 channel:buttonCh value:0];
+		else if(button_code == kMidiCHBtn_code)
+		{
+			inChannelChangeMode = NO;
+			[[PSPadKontrol sharedPadKontrol] clearLED];
+		}
+		else if(button_code == kFixedVelBtn_code)
+		{
+			velocityEnabled = !velocityEnabled;
+			[self updateLights];
+		}
+		else
+		{
+			// Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
+			uint8_t buttonCh = 5;
+			if(button_code == kXBtn_code)
+				[self transmitCC:16 channel:buttonCh value:0];
+			else if(button_code == kYBtn_code)
+				[self transmitCC:17 channel:buttonCh value:0];
+			else if(button_code == kPedalBtn_code)
+				[self transmitCC:18 channel:buttonCh value:0];
+			else if(button_code == kNoteCCBtn_code)
+				[self transmitCC:19 channel:buttonCh value:0];
+			else if(button_code == kMidiCHBtn_code)
+				[self transmitCC:20 channel:buttonCh value:0];
+			else if(button_code == kSWTypeBtn_code)
+				[self transmitCC:21 channel:buttonCh value:0];
+			else if(button_code == kRelValBtn_code)
+				[self transmitCC:22 channel:buttonCh value:0];
+			else if(button_code == kVelocityBtn_code)
+				[self transmitCC:23 channel:buttonCh value:0];
+			else if(button_code == kPortBtn_code)
+				[self transmitCC:24 channel:buttonCh value:0];
+			else if(button_code == kKnobAssignOneBtn_code)
+				[self transmitCC:25 channel:buttonCh value:0];
+			else if(button_code == kKnobAssignTwoBtn_code)
+				[self transmitCC:26 channel:buttonCh value:0];
+		}
 	}
 	else if([event type] == PSPadKontrolEncoderTurnEventType)
 	{
@@ -340,6 +377,14 @@ static PSSequencer *sharedSequencer = nil;
 			else if((direction == kEncoderDirectionRight) && (activePatternSet.activePattern.note < 127))
 				activePatternSet.activePattern.note += 1;
 			[self displayCurrentNoteOnLED];
+		}
+		else if(inChannelChangeMode)
+		{
+			if((direction == kEncoderDirectionLeft) && (activePatternSet.activePattern.channel > 1))
+				activePatternSet.activePattern.channel -= 1;
+			else if((direction == kEncoderDirectionRight) && (activePatternSet.activePattern.channel < 127))
+				activePatternSet.activePattern.channel += 1;
+			[self displayCurrentChannelOnLED];
 		}
 		else
 		{
@@ -373,6 +418,10 @@ static PSSequencer *sharedSequencer = nil;
 {
 	[[PSPadKontrol sharedPadKontrol] setLEDNumber:(NSInteger)activePatternSet.activePattern.note blink:NO];
 }
+- (void)displayCurrentChannelOnLED
+{
+	[[PSPadKontrol sharedPadKontrol] setLEDNumber:(NSInteger)activePatternSet.activePattern.channel blink:NO];
+}
 
 // Updates the lights on the controller
 // For information on the multipleLight thing, read PadKontrolConstants
@@ -388,6 +437,7 @@ static PSSequencer *sharedSequencer = nil;
 	if(activeView == PSSequencerSequencerView)
 	{
 		PSStep *currStep;
+		// Light the pads corresponding to active steps
 		for(int i = 0; i < 16; ++i)
 		{
 			currStep = [[activePattern steps] objectAtIndex:i];
@@ -419,7 +469,7 @@ static PSSequencer *sharedSequencer = nil;
 	else if(activeView == PSSequencerStepMuteView)
 	{
 		// Light the activator button
-		groupFive |= kMultipleLightGroup[6];
+		groupFive |= kMultipleLightGroup[5];
 		
 		NSMutableIndexSet *mutedSteps = activePatternSet.mutedSteps;
 		NSUInteger index = [mutedSteps firstIndex];
@@ -460,8 +510,6 @@ static PSSequencer *sharedSequencer = nil;
 	// Make sure toggle buttons are correctly lit
 	if(!velocityEnabled)
 		groupFour |= kMultipleLightGroup[4];
-	//if(inNoteChangeMode)
-	//	groupFour |= kMultipleLightGroup[5];
 	
 	// Create the mask and turn on the lights
 	uint8_t *mask;
@@ -477,7 +525,7 @@ static PSSequencer *sharedSequencer = nil;
 // MIDI interface
 - (void)takeMIDIMessages:(NSArray *)messages
 {
-	// We don't really receive anything
+	// We don't really receive anything except SysEx's
 }
 - (void)transmitCC:(uint8_t)ccNumber channel:(uint8_t)channel value:(uint8_t)value
 {

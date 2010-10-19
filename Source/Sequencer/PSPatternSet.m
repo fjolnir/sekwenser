@@ -21,7 +21,7 @@
 	PSPattern *currPat;
 	for(int i = 0; i < numberOfPatterns; ++i)
 	{
-		currPat = [PSPattern emptyPatternWithNote:i numberOfSteps:16];
+		currPat = [PSPattern emptyPatternWithNote:i+1 channel:1 numberOfSteps:16];
 		if(i == activePatternIndex)
 			ret.activePattern = currPat;
 		[ret.patterns addObject:currPat];
