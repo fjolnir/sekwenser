@@ -76,13 +76,24 @@ typedef enum
 	BOOL patSetSeqViewPlaceMode;
 	NSUInteger patSetSeq_stepToPlace;
 }
+@property(readwrite, assign) BOOL isActive;
+
 @property(readwrite, retain) NSMutableArray *patternSets;
 @property(readwrite, retain) PSPatternSet *activePatternSet;
 
 @property(readwrite, assign) NSUInteger numberOfSteps;
 @property(readwrite, assign) NSUInteger currentStep;
 
+@property(readwrite, assign) PSSequencerView activeView;
+@property(readwrite, assign) BOOL isModal;
+
+@property(readwrite, assign) BOOL inNoteChangeMode;
+@property(readwrite, assign) BOOL inChannelChangeMode;
+
 @property(readwrite, retain) SMVirtualOutputStream *virtualOutputStream;
+
+@property(readwrite, assign) BOOL shiftButtonHeld;
+@property(readwrite, assign) BOOL velocityEnabled;
 
 @property(readwrite, assign) BOOL inPatternSetSequencingMode;
 @property(readwrite, retain) NSMutableArray *patternSetSequencerSteps;
