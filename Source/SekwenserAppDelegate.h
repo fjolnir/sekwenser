@@ -26,11 +26,15 @@
 
 - (IBAction)refreshMidiSources:(id)sender;
 - (IBAction)selectSyncSource:(id)sender;
+
 - (IBAction)showOpenWindow:(id)sender;
 - (IBAction)loadSelected:(id)sender;
 - (void)performLoad:(NSString *)path;
+
+- (void)saveToPath:(NSString *)path;
 - (IBAction)performSave:(id)sender;
 - (IBAction)performSaveWithoutDialog:(id)sender;
+
 - (IBAction)performDelete:(id)sender;
 
 - (void)updateLayoutList;

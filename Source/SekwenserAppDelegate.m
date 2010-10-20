@@ -121,21 +121,24 @@
 	[[PSSequencer sharedSequencer] setActivePatternSet:[loadedSets objectAtIndex:0]];
 	[[PSSequencer sharedSequencer] updateLights];
 }
+- (void)saveToPath:(NSString *)path
+{
+	NSDictionary *forSaving = [NSDictionary dictionaryWithObjectsAndKeys:
+														 [[PSSequencer sharedSequencer] patternSets], @"patternSets",
+														 [PSSequencer sharedSequencer].patternSetSequencerSteps, @"patternSetSequencerSteps", nil];
+	BOOL success = [NSKeyedArchiver archiveRootObject:forSaving
+																						 toFile:path];
+	if(!success)
+		NSRunAlertPanel(NSLocalizedString(@"saveErrorTitle", @"Save Error"), NSLocalizedString(@"saveErrorDescription", @"There was an error while trying to build the layout file for saving."), NSLocalizedString(@"love", @"Fuck!"), nil, nil);
+	
+}
 - (IBAction)performSave:(id)sender
 {
 	NSSavePanel *savePanel = [NSSavePanel savePanel];
 	[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"seklayout"]];
 	[savePanel beginSheetModalForWindow:window completionHandler:^(NSInteger result){
 		if(result == NSFileHandlingPanelOKButton)
-		{
-			NSDictionary *forSaving = [NSDictionary dictionaryWithObjectsAndKeys:
-																 [[PSSequencer sharedSequencer] patternSets], @"patternSets",
-																 [PSSequencer sharedSequencer].patternSetSequencerSteps, @"patternSetSequencerSteps", nil];
-			BOOL success = [NSKeyedArchiver archiveRootObject:forSaving
-																								 toFile:[[savePanel URL] path]];
-			if(!success)
-				NSRunAlertPanel(NSLocalizedString(@"saveErrorTitle", @"Save Error"), NSLocalizedString(@"saveErrorDescription", @"There was an error while trying to build the layout file for saving."), NSLocalizedString(@"love", @"Fuck!"), nil, nil);
-		}
+			[self saveToPath:[[savePanel URL] path]];
 	}];
 }
 - (IBAction)performSaveWithoutDialog:(id)sender
@@ -147,11 +150,13 @@
 		NSLog(@"Couldn't create layout directory");
 		return;
 	}
-	NSString *destPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[[[NSDate date] descriptionWithCalendarFormat:@"%Y-%m-%d %H:%M:%S" timeZone:nil locale:nil] stringByAppendingPathExtension:@"seklayout"]];
-	[NSKeyedArchiver archiveRootObject:[[PSSequencer sharedSequencer] patternSets]
-															toFile:destPath];
+	NSUInteger fileNumber = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:LAYOUT_DIR_PATH error:nil] count] + 1;
+	NSString *destPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[NSString stringWithFormat:@"Layout %d.seklayout", fileNumber]];
+	[self saveToPath:destPath];
+	
 	[self updateLayoutList];
 }
+
 - (IBAction)performDelete:(id)sender
 {
 	NSString *trashDir = [NSHomeDirectory() stringByAppendingPathComponent:@".Trash"];
