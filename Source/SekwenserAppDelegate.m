@@ -109,10 +109,15 @@
 - (void)performLoad:(NSString *)path
 {
 	NSMutableArray *loadedSets;
-	loadedSets = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+	NSMutableArray *loadedPatternSeqSteps;
+	NSDictionary *loadedData = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
+	
+	loadedSets = [loadedData objectForKey:@"patternSets"];
+	loadedPatternSeqSteps = [loadedData objectForKey:@"patternSetSequencerSteps"];
 	
 	[[PSSequencer sharedSequencer] resetSequencer];
 	[[PSSequencer sharedSequencer] setPatternSets:loadedSets];
+	[[PSSequencer sharedSequencer] setPatternSetSequencerSteps:loadedPatternSeqSteps];
 	[[PSSequencer sharedSequencer] setActivePatternSet:[loadedSets objectAtIndex:0]];
 	[[PSSequencer sharedSequencer] updateLights];
 }
@@ -123,7 +128,10 @@
 	[savePanel beginSheetModalForWindow:window completionHandler:^(NSInteger result){
 		if(result == NSFileHandlingPanelOKButton)
 		{
-			BOOL success = [NSKeyedArchiver archiveRootObject:[[PSSequencer sharedSequencer] patternSets]
+			NSDictionary *forSaving = [NSDictionary dictionaryWithObjectsAndKeys:
+																 [[PSSequencer sharedSequencer] patternSets], @"patternSets",
+																 [PSSequencer sharedSequencer].patternSetSequencerSteps, @"patternSetSequencerSteps", nil];
+			BOOL success = [NSKeyedArchiver archiveRootObject:forSaving
 																								 toFile:[[savePanel URL] path]];
 			if(!success)
 				NSRunAlertPanel(NSLocalizedString(@"saveErrorTitle", @"Save Error"), NSLocalizedString(@"saveErrorDescription", @"There was an error while trying to build the layout file for saving."), NSLocalizedString(@"love", @"Fuck!"), nil, nil);
