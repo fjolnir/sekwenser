@@ -1,4 +1,53 @@
-A Step Sequencer for use with the Korg PADKONTROL MIDI drum controller
-The project is still in development (although in working condition) so I haven't written any documentation yet
+____ ____ _  _ _ _ _ ____ _  _ ____ ____ ____
+[__  |___ |_/  | | | |___ |\ | [__  |___ |__/
+___] |___ | \_ |_|_| |___ | \| ___] |___ |  \
 
-Here is an introduction: http://www.korgforums.com/forum/phpBB2/viewtopic.php?t=55887
+sekwenser read me.
+
+
+Description,
+-
+sekwenser is a step sequencer for the Korg PadKontrol MIDI drum pad controller. It's entirely controlled from the controller and displays feedback to the user through the LED lights and screen on it.
+
+sekwenser meant for quickly creating beats or synth lines in a live setting (although it's probably quite useful in the studio as well).
+
+
+Features,
+-
+ ~ 16 pattern groups (a group represents patterns played simultaneously)
+   ~ 16 patterns per group
+     ~ 16 steps per pattern
+     ~ MIDI channel and note of each pattern is configurable
+ ~ Per step velocity sensitivity
+ ~ Pad mutes (Mute a step in every pattern)
+ ~ Copy/Paste of pattern groups for quickly building a new pattern on top of an old one
+ ~ Sequencing of pattern groups (that is, play chosen patterns in order)
+ ~ Makes every button on the PadKontrol send MIDI CC's (not possible on a vanilla PadKontrol)
+
+
+Usage,
+-
+When you open sekwenser you are presented with a window containing a popup button that contains the available MIDI sources on your machine. Choose your desired MIDI clock source from the list. Sekwenser will start when your source begins to transmit. (when you hit play in your DAW)
+
+Tip: If your DAW does not make available a virtual interface to sync with (for example Ableton Live), use IAC to create one that you can then tell your DAW to synchronize with.
+
+When opened, sekwenser starts in "Sequencing mode" in this mode you can toggle which steps in the current pattern are active.
+
+To select a different pattern hold down the "Scene" button then the pads will change to reflect the current pattern, press a pad to change it.
+
+To select a different pattern group hold down the "Message" button, just as with the pattern selection the pads will change.
+
+To toggle velocity sensitivity press "Fixed velocity", if the light is on all pad hits are registered at full velocity, if unlit the force you press with will determine the velocity.
+
+To toggle pattern group sequencing on/off press "Program change". In this mode instead of sequencing the currently selected pattern, sekwenser will play the current step in the pattern group sequence (explained below) enabling you to edit a pattern without having to make it play while you edit.
+
+To edit the pattern group sequence hold down the "Hold button". All the pads will light up, (if playing, the currently playing pattern will be blinking) they represent the available groups. Press your desired group, the lights will then change to represent the pattern sequence. Hit the pad at the position you want to place the pattern to place it there.
+
+To mute pads hold down the "Flam" button, the lights will change to reflect the currently muted pads, if any. Press the pads you wish to mute.
+
+To copy paste pattern groups hold down the "Roll button", the lights will all light up. Press the group you wish to copy, then press the destination group.
+
+
+Contact, 
+-
+If you have any questions please feel free to email me at f<at>ninjakitten.us. I will try to get back to you as soon as I can.
