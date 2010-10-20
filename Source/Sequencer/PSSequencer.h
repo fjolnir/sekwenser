@@ -100,6 +100,9 @@ typedef enum
 	// If YES he's meant to select a destination position in the sequence
 	BOOL patSetSeqViewPlaceMode;
 	NSUInteger patSetSeq_stepToPlace;
+	
+	// An array of ON midi notes that need an OFF message to be sent
+	NSMutableArray *midiMessagesAlive;
 }
 @property(readwrite, assign) BOOL isActive;
 

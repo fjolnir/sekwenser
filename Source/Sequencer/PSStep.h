@@ -38,10 +38,8 @@
 @interface PSStep : NSObject<NSCoding, NSCopying> {
 	BOOL enabled;
 	uint8_t velocity; // MIDI properties
-	
-	BOOL noteOn;
 }
-@property(readwrite, assign) BOOL enabled, noteOn;
+@property(readwrite, assign) BOOL enabled;
 @property(readwrite, assign) uint8_t velocity;
 
 + (PSStep *)stepWithVelocity:(uint8_t)inVelocity;

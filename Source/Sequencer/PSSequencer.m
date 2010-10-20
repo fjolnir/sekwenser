@@ -82,6 +82,8 @@ static PSSequencer *sharedSequencer = nil;
 	self.velocityEnabled = NO;
 	self.isModal = NO;
 	
+	midiMessagesAlive = [[NSMutableArray alloc] init];
+	
 	self.patternSetSequencerSteps = [NSMutableArray array];
 
 	// Create the patterns
@@ -133,25 +135,19 @@ static PSSequencer *sharedSequencer = nil;
 			return; // nothing to play
 	}
 	
+	
+	// Turn off all notes
+	for(SMVoiceMessage *aMsg in midiMessagesAlive)
+	{
+		[aMsg setStatus:SMVoiceMessageStatusNoteOff];
+		[aMsg setDataByte2:0x00];
+		[midiMessages addObject:aMsg];
+	}
+	[midiMessagesAlive removeAllObjects];
+	
 	Byte noteData[2] = {0x00, 0x00};
 	for(PSPattern *pattern in patternSet.patterns)
 	{
-		// Turn off active notes
-		for(PSStep *step in pattern.steps)
-		{
-			if(!step.noteOn) continue;
-			
-			// Else we send a off message
-			noteData[0] = pattern.note;
-			noteData[1] = 0x00;
-			SMVoiceMessage *message = [SMVoiceMessage voiceMessageWithTimeStamp:SMGetCurrentHostTime()
-																															 statusByte:SMVoiceMessageStatusNoteOff 
-																																		 data:noteData 
-																																	 length:2];
-			[message setChannel:pattern.channel];
-			[midiMessages addObject:message];
-			step.noteOn = NO;
-		}
 		// Send the note  for the active step
 		PSStep *step = [pattern.steps objectAtIndex:currentStep];
 		if(![patternSet.mutedSteps containsIndex:currentStep] && step.enabled)
@@ -165,7 +161,7 @@ static PSSequencer *sharedSequencer = nil;
 																																	 length:2];
 			[message setChannel:pattern.channel];
 			[midiMessages addObject:message];
-			step.noteOn = YES;
+			[midiMessagesAlive addObject:message];
 		}
 	}
 	[virtualOutputStream takeMIDIMessages:midiMessages];
@@ -678,6 +674,8 @@ static PSSequencer *sharedSequencer = nil;
 
 - (void)dealloc
 {
+	[midiMessagesAlive release];
+	
 	[super dealloc];
 }
 @end

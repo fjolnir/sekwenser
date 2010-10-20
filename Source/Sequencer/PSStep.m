@@ -36,7 +36,7 @@
 
 
 @implementation PSStep
-@synthesize enabled, velocity, noteOn;
+@synthesize enabled, velocity;
 
 + (PSStep *)stepWithVelocity:(uint8_t)inVelocity
 {
