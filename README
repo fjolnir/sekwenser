@@ -47,6 +47,12 @@ To mute pads hold down the "Flam" button, the lights will change to reflect the 
 
 To copy paste pattern groups hold down the "Roll button", the lights will all light up. Press the group you wish to copy, then press the destination group.
 
+To change the note of the current pattern hold down "Setting" & "Note/CC#", then turn the encoder wheel. The note will be displayed on the screen
+
+Changing the MIDI channel is the same as with a note except you hold down "MIDI Ch"
+
+You can temporarily exit the sequencer mode by holding down "scene" and pressing "setting". The sequence will keep playing, but the padkontrol will go back to acting as drumpads. Send Program change 0 to get back to the sequencer interface (Press "Prog Change") 
+
 
 Contact, 
 -
