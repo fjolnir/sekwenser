@@ -25,7 +25,7 @@ typedef enum
 	PSSequencerPatternSelectView = 3,
 	PSSequencerStepMuteView = 4,
 	PSSequencerPatternCopyView = 5,
-	PSSequencerPatternSequencerView = 6
+	PSSequencerPatternSetSequencerView = 6
 } PSSequencerView;
 
 @interface PSSequencer : NSObject <SMMessageDestination, PSClockListener, PSPadKontrolEventListener> {	

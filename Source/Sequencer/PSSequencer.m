@@ -152,7 +152,7 @@ static PSSequencer *sharedSequencer = nil;
 		uint8_t lightState = kPad_shortOneshot_code+0x02; // add 2 to make the flash slightly longer
 		[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode state:&lightState];
 	}
-	else if(self.activeView == PSSequencerPatternSequencerView && self.inPatternSetSequencingMode)
+	else if(self.activeView == PSSequencerPatternSetSequencerView && self.inPatternSetSequencingMode)
 	{
 		// In pattern set sequencer view the blinking is handled, in updateLights
 		// Reason being if we don't update/maintain the blink status after updating the lights things look ugly
@@ -247,7 +247,7 @@ static PSSequencer *sharedSequencer = nil;
 				performingCopy = NO;
 			}
 		}
-		else if(activeView == PSSequencerPatternSequencerView)
+		else if(activeView == PSSequencerPatternSetSequencerView)
 		{
 			NSUInteger index = event.affectedPad;
 			
@@ -306,7 +306,7 @@ static PSSequencer *sharedSequencer = nil;
 			}
 			else if(button_code == kHoldBtn_code)
 			{
-				[self selectView:PSSequencerPatternSequencerView];
+				[self selectView:PSSequencerPatternSetSequencerView];
 				self.isModal = YES;
 			}
 			else if(button_code == kFlamBtn_code)
@@ -384,7 +384,7 @@ static PSSequencer *sharedSequencer = nil;
 			 ||  (button_code == kFlamBtn_code    && activeView == PSSequencerStepMuteView)
 			 ||  (button_code == kMessageBtn_code && activeView == PSSequencerPatternSetSelectView)
 			 ||  (button_code == kRollBtn_code    && activeView == PSSequencerPatternCopyView)
-			 ||  (button_code == kHoldBtn_code    && activeView == PSSequencerPatternSequencerView))
+			 ||  (button_code == kHoldBtn_code    && activeView == PSSequencerPatternSetSequencerView))
 		{
 			[self selectView:PSSequencerSequencerView];
 			self.isModal = NO;
@@ -579,7 +579,7 @@ static PSSequencer *sharedSequencer = nil;
 		groupTwo = 0x7f;
 		groupThree |= kMultipleLightGroup[0]| kMultipleLightGroup[1];
 	}
-	else if(self.activeView == PSSequencerPatternSequencerView)
+	else if(self.activeView == PSSequencerPatternSetSequencerView)
 	{
 		NSUInteger stepsToLight = 16;
 		if(self.shiftButtonHeld) // delete view
@@ -614,7 +614,7 @@ static PSSequencer *sharedSequencer = nil;
 	free(mask);
 	
 	// If necessary, flash the currently playing pattern set in the pattern set sequencer
-	if(self.activeView == PSSequencerPatternSequencerView && inPatternSetSequencingMode)
+	if(self.activeView == PSSequencerPatternSetSequencerView && inPatternSetSequencingMode)
 	{
 		uint8_t lightCode = kPadOn_codes[currentPatSetSeqStep];
 		uint8_t lightState = kPad_blink_code;
