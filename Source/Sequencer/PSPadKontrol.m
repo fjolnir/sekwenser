@@ -406,7 +406,7 @@ PSPadKontrol *sharedPadKontrol;
 			{
 				if([voiceMessage dataByte1] == 0x10 && [voiceMessage dataByte2] == 0x7f && [voiceMessage matchesChannelMask:SMChannelMask16])
 					[self enterNativeMode];
-				NSLog(@"Received cc change %d %d ch %d", [voiceMessage dataByte1], [voiceMessage dataByte2], [voiceMessage channel]);
+				//NSLog(@"Received cc change %d %d ch %d", [voiceMessage dataByte1], [voiceMessage dataByte2], [voiceMessage channel]);
 			}
 		}
 	}
