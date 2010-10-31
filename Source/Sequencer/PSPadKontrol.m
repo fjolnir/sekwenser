@@ -398,15 +398,15 @@ PSPadKontrol *sharedPadKontrol;
 	{
 		if([message isMemberOfClass:[SMSystemExclusiveMessage class]])
 			[self handleSysexMessage:(SMSystemExclusiveMessage *)message];
-		// Listen for Control change 0, if received we go back into native mode
+		// Listen for CC 16 with value 127 CH 16, if received we go back into native mode
 		else if([message isMemberOfClass:[SMVoiceMessage class]])
 		{
 			SMVoiceMessage *voiceMessage = (SMVoiceMessage *)message;
-			if([voiceMessage status] == SMVoiceMessageStatusProgram)
+			if([voiceMessage status] == SMVoiceMessageStatusControl)
 			{
-				if([voiceMessage dataByte1] == 0x00)
+				if([voiceMessage dataByte1] == 0x10 && [voiceMessage dataByte2] == 0x7f && [voiceMessage matchesChannelMask:SMChannelMask16])
 					[self enterNativeMode];
-				//NSLog(@"Received program change %d %d", [voiceMessage dataByte1], [voiceMessage dataByte2]);
+				NSLog(@"Received cc change %d %d ch %d", [voiceMessage dataByte1], [voiceMessage dataByte2], [voiceMessage channel]);
 			}
 		}
 	}

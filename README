@@ -51,7 +51,8 @@ To change the note of the current pattern hold down "Setting" & "Note/CC#", then
 
 Changing the MIDI channel is the same as with a note except you hold down "MIDI Ch"
 
-You can temporarily exit the sequencer mode by holding down "scene" and pressing "setting". The sequence will keep playing, but the padkontrol will go back to acting as drumpads. Send Program change 0 to get back to the sequencer interface (Press "Prog Change") 
+You can temporarily exit the sequencer mode by holding down "scene" and pressing "setting". The sequence will keep playing, but the padkontrol will go back to acting as drumpads. 
+ Send CC 16 Value 127 on Channel 16 to get back to the sequencer interface (I assign it to one of the user message pads) 
 
 
 Contact, 
