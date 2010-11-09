@@ -197,7 +197,7 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 	CATempoMapEntry tempoMap;
 	tempoMap.beats = 4.0;
 	tempoMap.tempoBPM = internalBPM;
-	CAClockSetProperty(caClock, kCAClockProperty_TempoMap, sizeof(CATempoMapEntry), &tempoMap);
+	err = CAClockSetProperty(caClock, kCAClockProperty_TempoMap, sizeof(CATempoMapEntry), &tempoMap);
 	if(err)
 		NSLog(@"Error setting clock tempomap (in %f err %d)", internalBPM, err);
 }
@@ -320,7 +320,7 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 			NSLog(@"Clock start time set");
 			break;
 		default:
-			NSLog(@"Unknown clock message received: %@", UTCreateStringForOSType(message));
+			NSLog(@"Unknown clock message received: %@", [(NSString *)UTCreateStringForOSType(message) autorelease]);
 			break;
 	}
 	

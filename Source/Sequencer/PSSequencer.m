@@ -136,7 +136,7 @@ static PSSequencer *sharedSequencer = nil;
 	}
 	
 	
-	// Turn off all notes
+	// Turn off all notes currently on
 	for(SMVoiceMessage *aMsg in midiMessagesAlive)
 	{
 		[aMsg setStatus:SMVoiceMessageStatusNoteOff];
@@ -177,7 +177,7 @@ static PSSequencer *sharedSequencer = nil;
 	else if(self.activeView == PSSequencerPatternSetSequencerView && self.inPatternSetSequencingMode)
 	{
 		// In pattern set sequencer view the blinking is handled, in updateLights
-		// Reason being if we don't update/maintain the blink status after updating the lights things look ugly
+		// Reason being if we don't update/maintain the blink status after updating the lights, things'll look ugly
 		[self updateLights];
 	}
 	
@@ -494,7 +494,7 @@ static PSSequencer *sharedSequencer = nil;
 		uint8_t ccCode;
 		if(event.affected_entity_code == kKnobOne_code)
 			ccCode = 27;
-		if(event.affected_entity_code == kKnobTwo_code)
+		else if(event.affected_entity_code == kKnobTwo_code)
 			ccCode = 28;
 		[self transmitCC:ccCode channel:5 value:*event.values];
 	}

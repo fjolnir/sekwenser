@@ -262,7 +262,7 @@ PSPadKontrol *sharedPadKontrol;
 	PSPadKontrolEvent *event;
 	PSPadKontrolEventType eventType;
 	PSPadKontrolVelocity eventVelocity = 0x00;
-	PSPadKontrolValue *eventValues;
+	PSPadKontrolValue *eventValues = 0x00;
 	NSUInteger numberOfEventValues = 0;
 	NSInteger affectedPad = -1;
 	uint8_t affected_entity_code = 0x00;

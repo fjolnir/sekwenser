@@ -69,11 +69,9 @@
 {
 	int i = 0;
 	PSPattern *currentCopy;
-	PSPattern *toBeOverWritten;
 	for(PSPattern *pattern in patternSetToCopy.patterns)
 	{
 		currentCopy = [pattern copy];
-		toBeOverWritten = [self.patterns objectAtIndex:i];
 		currentCopy.note = pattern.note;
 		[self.patterns replaceObjectAtIndex:i withObject:currentCopy];
 		[currentCopy release];
