@@ -26,8 +26,6 @@
 		C7D04341126088B600503FD6 /* PSStep.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04340126088B600503FD6 /* PSStep.m */; };
 		C7D0434C1260897B00503FD6 /* PSPatternSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D0434B1260897B00503FD6 /* PSPatternSet.m */; };
 		C7D043C4126094C500503FD6 /* PadKontrolConstants.c in Sources */ = {isa = PBXBuildFile; fileRef = C7D043C3126094C500503FD6 /* PadKontrolConstants.c */; };
-		C7D0445D1260A5EA00503FD6 /* BWToolkitFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */; };
-		C7D044601260A5F200503FD6 /* BWToolkitFramework.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */; };
 		C7D046AF1260E7E900503FD6 /* PSClock.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D046AE1260E7E900503FD6 /* PSClock.m */; };
 		C7D048C91261AAEC00503FD6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */; };
 		C7D04D6012623CED00503FD6 /* PSPadKontrol.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04D5F12623CED00503FD6 /* PSPadKontrol.m */; };
@@ -42,7 +40,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C7D044601260A5F200503FD6 /* BWToolkitFramework.framework in Copy Frameworks */,
 				C7D041FB126071CF00503FD6 /* SnoizeMIDI.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
@@ -86,7 +83,6 @@
 		C7D0434A1260897B00503FD6 /* PSPatternSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPatternSet.h; sourceTree = "<group>"; };
 		C7D0434B1260897B00503FD6 /* PSPatternSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPatternSet.m; sourceTree = "<group>"; };
 		C7D043C3126094C500503FD6 /* PadKontrolConstants.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = PadKontrolConstants.c; sourceTree = "<group>"; };
-		C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BWToolkitFramework.framework; path = /Users/fyolnish/Library/Frameworks/BWToolkitFramework.framework; sourceTree = "<absolute>"; };
 		C7D046AD1260E7E900503FD6 /* PSClock.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSClock.h; sourceTree = "<group>"; };
 		C7D046AE1260E7E900503FD6 /* PSClock.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSClock.m; sourceTree = "<group>"; };
 		C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
@@ -107,7 +103,6 @@
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				C7D041CF1260718100503FD6 /* CoreMIDI.framework in Frameworks */,
 				C7D041D11260718B00503FD6 /* SnoizeMIDI.framework in Frameworks */,
-				C7D0445D1260A5EA00503FD6 /* BWToolkitFramework.framework in Frameworks */,
 				C7D048C91261AAEC00503FD6 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -121,7 +116,6 @@
 				C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */,
 				C7D041CE1260718100503FD6 /* CoreMIDI.framework */,
 				C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */,
-				C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
 			);
 			name = "Linked Frameworks";
@@ -354,7 +348,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../../Library/Frameworks\"",
 				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -362,7 +355,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Sekwenser_Prefix.pch;
-				INFOPLIST_FILE = "Sekwenser-Info.plist";
+				INFOPLIST_FILE = "Resources/Sekwenser-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = sekwenser;
 			};
@@ -377,12 +370,11 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)\"",
-					"\"$(SRCROOT)/../../Library/Frameworks\"",
 				);
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = Sekwenser_Prefix.pch;
-				INFOPLIST_FILE = "Sekwenser-Info.plist";
+				INFOPLIST_FILE = "Resources/Sekwenser-Info.plist";
 				INSTALL_PATH = "$(HOME)/Applications";
 				PRODUCT_NAME = sekwenser;
 			};

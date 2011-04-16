@@ -1146,7 +1146,7 @@
 								<reference key="NSTextColor" ref="165134939"/>
 							</object>
 						</object>
-						<object class="NSImageView" id="773252986">
+						<object class="NSImageView" id="170682435">
 							<reference key="NSNextResponder" ref="378901119"/>
 							<int key="NSvFlags">256</int>
 							<object class="NSMutableSet" key="NSDragTypes">
@@ -1164,8 +1164,9 @@
 							<string key="NSFrame">{{0, 290}, {480, 74}}</string>
 							<reference key="NSSuperview" ref="378901119"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="733539056"/>
 							<bool key="NSEnabled">YES</bool>
-							<object class="NSImageCell" key="NSCell" id="468600139">
+							<object class="NSImageCell" key="NSCell" id="211945007">
 								<int key="NSCellFlags">130560</int>
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
@@ -1183,10 +1184,10 @@
 					<string key="NSFrame">{{7, 11}, {480, 364}}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView"/>
+					<reference key="NSNextKeyView" ref="170682435"/>
 					<int key="NSViewLayerContentsRedrawPolicy">2</int>
 				</object>
-				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
+				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
 				<string key="NSMinSize">{480, 386}</string>
 				<string key="NSMaxSize">{480, 10021}</string>
 			</object>
@@ -2177,7 +2178,7 @@
 							<reference ref="404051979"/>
 							<reference ref="80018404"/>
 							<reference ref="408822308"/>
-							<reference ref="773252986"/>
+							<reference ref="170682435"/>
 						</object>
 						<reference key="parent" ref="863924289"/>
 					</object>
@@ -2368,17 +2369,17 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">687</int>
-						<reference key="object" ref="773252986"/>
+						<reference key="object" ref="170682435"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="468600139"/>
+							<reference ref="211945007"/>
 						</object>
 						<reference key="parent" ref="378901119"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">688</int>
-						<reference key="object" ref="468600139"/>
-						<reference key="parent" ref="773252986"/>
+						<reference key="object" ref="211945007"/>
+						<reference key="parent" ref="170682435"/>
 					</object>
 				</object>
 			</object>
