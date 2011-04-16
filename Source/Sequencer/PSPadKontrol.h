@@ -40,6 +40,10 @@
 
 #define PSPadKontrolVelocityToFloat(x) ((float)x/127.0)
 
+#define kPSPadKontrolCTRLDeviceName @"CTRL"
+#define kPSPadKontrolPortADeviceName @"PORT A"
+#define kPSPadKontrolPortBDeviceName @"PORT B"
+
 @class SSECombinationOutputStream;
 @class SMPortInputStream;
 
@@ -63,6 +67,10 @@ typedef uint8_t PSPadKontrolValue;
 
 + (PSPadKontrol *)sharedPadKontrol;
 - (id)initWithInputCTRL:(NSString *)ctrlDeviceName portA:(NSString *)portAName portB:(NSString *)portBName;
+
+// Listeners
+- (void)registerEventListener:(id)listener;
+- (void)unregisterEventListener:(id)listener;
 
 - (void)controlLight:(uint8_t *)lightIdentifier state:(uint8_t *)lightState;
 // Button mask is 5 bytes, led mask is 3 bytes

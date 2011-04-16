@@ -43,8 +43,8 @@
 PSPadKontrol *sharedPadKontrol;
 
 @interface PSPadKontrol ()
-- (void)transmitEvent:(PSPadKontrolEvent *)anEvent;
-- (uint8_t)convertIncomingButtonCodeToOutputOne:(uint8_t)inCode;
+- (void)_transmitEvent:(PSPadKontrolEvent *)anEvent;
+- (uint8_t)_convertIncomingButtonCodeToOutputOne:(uint8_t)inCode;
 @end
 
 @implementation PSPadKontrol
@@ -59,7 +59,9 @@ PSPadKontrol *sharedPadKontrol;
 
 - (id)init
 {
-	return [self initWithInputCTRL:@"CTRL" portA:@"PORT A" portB:@"PORT B"];
+	return [self initWithInputCTRL:kPSPadKontrolCTRLDeviceName 
+                           portA:kPSPadKontrolPortADeviceName 
+                           portB:kPSPadKontrolPortBDeviceName];
 }
 - (id)initWithInputCTRL:(NSString *)ctrlDeviceName portA:(NSString *)portAName portB:(NSString *)portBName
 {
@@ -110,7 +112,16 @@ PSPadKontrol *sharedPadKontrol;
 	}
 	
 	return self;
-}	
+}
+
+#pragma mark -
+// Listeners
+- (void)registerEventListener:(id)listener {
+  [eventListeners addObject:listener];
+}
+- (void)unregisterEventListener:(id)listener {
+  [eventListeners removeObject:listener];
+}
 
 #pragma mark -
 // PadKONTROL communication
@@ -125,7 +136,7 @@ PSPadKontrol *sharedPadKontrol;
 																							 numberOfValues:0
 																									affectedPad:-1
 																					 affectedEntityCode:0];
-	[self transmitEvent:event];
+	[self _transmitEvent:event];
 }
 
 - (void)exitNativeMode
@@ -294,7 +305,7 @@ PSPadKontrol *sharedPadKontrol;
 		[data getBytes:buttonInfo range:NSMakeRange(commandLoc+1, 2)];
 		
 		affected_entity_code = *buttonInfo;
-		affected_entity_code = [self convertIncomingButtonCodeToOutputOne:affected_entity_code];
+		affected_entity_code = [self _convertIncomingButtonCodeToOutputOne:affected_entity_code];
 		if(*(buttonInfo+1) == 127)
 		{
 		//	NSLog(@"Button pushed %d status %d", *buttonInfo, *(buttonInfo+1));
@@ -361,10 +372,10 @@ PSPadKontrol *sharedPadKontrol;
 														numberOfValues:numberOfEventValues
 															 affectedPad:affectedPad
 											affectedEntityCode:affected_entity_code];
-	[self transmitEvent:event];
+	[self _transmitEvent:event];
 }
 
-- (void)transmitEvent:(PSPadKontrolEvent *)anEvent
+- (void)_transmitEvent:(PSPadKontrolEvent *)anEvent
 {
 	for(id<PSPadKontrolEventListener> listener in self.eventListeners)
 	{
@@ -422,7 +433,7 @@ PSPadKontrol *sharedPadKontrol;
 }
 
 // Converts incoming button identifiers to the ones usable to handle lights
-- (uint8_t)convertIncomingButtonCodeToOutputOne:(uint8_t)inCode
+- (uint8_t)_convertIncomingButtonCodeToOutputOne:(uint8_t)inCode
 {
 	uint8_t outCode = 0x00;
 	switch(inCode)
