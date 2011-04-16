@@ -32,6 +32,7 @@
 		C7D048C91261AAEC00503FD6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */; };
 		C7D04D6012623CED00503FD6 /* PSPadKontrol.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04D5F12623CED00503FD6 /* PSPadKontrol.m */; };
 		C7D04ED412633BDE00503FD6 /* PSPadKontrolEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04ED312633BDE00503FD6 /* PSPadKontrolEvent.m */; };
+		C7F535E9135A0FFE00D5C9FC /* header.png in Resources */ = {isa = PBXBuildFile; fileRef = C7F535E8135A0FFE00D5C9FC /* header.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -95,6 +96,7 @@
 		C7D04ED212633BDE00503FD6 /* PSPadKontrolEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadKontrolEvent.h; sourceTree = "<group>"; };
 		C7D04ED312633BDE00503FD6 /* PSPadKontrolEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPadKontrolEvent.m; sourceTree = "<group>"; };
 		C7D04F451263495000503FD6 /* PSPadKontrolEventListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadKontrolEventListener.h; sourceTree = "<group>"; };
+		C7F535E8135A0FFE00D5C9FC /* header.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = header.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +118,8 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */,
+				C7D041CE1260718100503FD6 /* CoreMIDI.framework */,
 				C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */,
 				C7D0445C1260A5EA00503FD6 /* BWToolkitFramework.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
@@ -166,18 +170,17 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				C7F535E8135A0FFE00D5C9FC /* header.png */,
 				8D1107310486CEB800E47090 /* Sekwenser-Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
 			);
-			name = Resources;
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C7D041CE1260718100503FD6 /* CoreMIDI.framework */,
-				C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */,
 				1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */,
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
@@ -291,6 +294,7 @@
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
 				C7BFF2DC127D6BE30028841F /* README in Resources */,
+				C7F535E9135A0FFE00D5C9FC /* header.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
