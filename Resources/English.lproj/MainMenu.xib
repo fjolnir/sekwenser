@@ -1146,9 +1146,9 @@
 								<reference key="NSTextColor" ref="165134939"/>
 							</object>
 						</object>
-						<object class="NSImageView" id="170682435">
+						<object class="NSImageView" id="275148216">
 							<reference key="NSNextResponder" ref="378901119"/>
-							<int key="NSvFlags">256</int>
+							<int key="NSvFlags">266</int>
 							<object class="NSMutableSet" key="NSDragTypes">
 								<bool key="EncodedWithXMLCoder">YES</bool>
 								<object class="NSArray" key="set.sortedObjects">
@@ -1166,7 +1166,7 @@
 							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="733539056"/>
 							<bool key="NSEnabled">YES</bool>
-							<object class="NSImageCell" key="NSCell" id="211945007">
+							<object class="NSImageCell" key="NSCell" id="36338975">
 								<int key="NSCellFlags">130560</int>
 								<int key="NSCellFlags2">33554432</int>
 								<object class="NSCustomResource" key="NSContents">
@@ -1184,7 +1184,7 @@
 					<string key="NSFrame">{{7, 11}, {480, 364}}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView" ref="170682435"/>
+					<reference key="NSNextKeyView" ref="275148216"/>
 					<int key="NSViewLayerContentsRedrawPolicy">2</int>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1058}}</string>
@@ -2178,7 +2178,7 @@
 							<reference ref="404051979"/>
 							<reference ref="80018404"/>
 							<reference ref="408822308"/>
-							<reference ref="170682435"/>
+							<reference ref="275148216"/>
 						</object>
 						<reference key="parent" ref="863924289"/>
 					</object>
@@ -2369,17 +2369,17 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">687</int>
-						<reference key="object" ref="170682435"/>
+						<reference key="object" ref="275148216"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="211945007"/>
+							<reference ref="36338975"/>
 						</object>
 						<reference key="parent" ref="378901119"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">688</int>
-						<reference key="object" ref="211945007"/>
-						<reference key="parent" ref="170682435"/>
+						<reference key="object" ref="36338975"/>
+						<reference key="parent" ref="275148216"/>
 					</object>
 				</object>
 			</object>
