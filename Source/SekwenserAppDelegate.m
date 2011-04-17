@@ -44,13 +44,11 @@
 #define LAYOUT_DIR_PATH [@"~/Documents/sekwenser layouts" stringByExpandingTildeInPath]
 
 @implementation SekwenserAppDelegate
-@synthesize window, savedLayouts, layoutListTable;
+@synthesize window=_window, savedLayouts=_savedLayouts, layoutListTable=_layoutListTable;
 
-- (void)applicationWillFinishLaunching:(NSNotification *)notification
-{
+- (void)applicationWillFinishLaunching:(NSNotification *)notification {
 	// Initialize midi before the app finishes launching
-	if([SMClient sharedClient] == nil)
-	{
+	if([SMClient sharedClient] == nil) {
 		NSRunAlertPanel(NSLocalizedString(@"MIDIinitFailTitle", @"Couldn't initialize MIDI"),
 										NSLocalizedString(@"MIDIinitFailDescription", @"There was an error while trying to initialize the CoreMIDI subsystem")
 																			, @"Quit", nil, nil);
@@ -69,71 +67,67 @@
 	[self updateLayoutList];
 	[self refreshMidiSources:nil];
 }
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
-{
-	[self.window orderFront:nil];
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
+	[_window orderFront:nil];
 }
 
-- (void)applicationWillTerminate:(NSNotification *)notification
-{
+- (void)applicationWillTerminate:(NSNotification *)notification {
 	[[PSPadKontrol sharedPadKontrol] exitNativeMode];
 }
 
+- (void)dealloc {
+  [_savedLayouts release];
+  
+  [super dealloc];
+}
+
 // Interface stuff
-- (IBAction)refreshMidiSources:(id)sender
-{
+- (IBAction)refreshMidiSources:(id)sender {
 	OSErr err;
 	
-	[syncSourcePopupBtn removeAllItems];
+	[_syncSourcePopupBtn removeAllItems];
 	unsigned numberOfSources = MIDIGetNumberOfSources();
-	if(numberOfSources == 0)
-	{
-		[syncSourcePopupBtn addItemWithTitle:@"No MIDI Inputs found"];
+	if(numberOfSources == 0) {
+		[_syncSourcePopupBtn addItemWithTitle:@"No MIDI Inputs found"];
 		return;
 	}
 	MIDIEndpointRef currPoint;
 	CFStringRef srcDisplayName;
-	for(int i = 0; i < numberOfSources; ++i)
-	{
+	for(int i = 0; i < numberOfSources; ++i) {
 		currPoint = MIDIGetSource(i);
 		err = MIDIObjectGetStringProperty(currPoint, kMIDIPropertyDisplayName, &srcDisplayName);
 		if (err) 
 			NSLog(@"MIDI Get sourceName err = %d", err);
 		
-		[syncSourcePopupBtn addItemWithTitle:(NSString *)srcDisplayName];
-		if([(NSString *)srcDisplayName isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:@"MIDISyncSource"]])
-		{
-			[syncSourcePopupBtn selectItemAtIndex:i];
+		[_syncSourcePopupBtn addItemWithTitle:(NSString *)srcDisplayName];
+		if([(NSString *)srcDisplayName isEqualToString:[[NSUserDefaults standardUserDefaults] objectForKey:@"MIDISyncSource"]]) {
+			[_syncSourcePopupBtn selectItemAtIndex:i];
 			[[PSClock globalClock] setMIDISyncSource:(NSString *)srcDisplayName];
 		}
 		CFRelease(srcDisplayName);
 	}
 	
 }
-- (IBAction)selectSyncSource:(id)sender
-{
-	NSString *sourceName = [syncSourcePopupBtn titleOfSelectedItem];
+- (IBAction)selectSyncSource:(id)sender {
+	NSString *sourceName = [_syncSourcePopupBtn titleOfSelectedItem];
 	[[PSClock globalClock] setMIDISyncSource:sourceName];
 	[[NSUserDefaults standardUserDefaults] setObject:sourceName forKey:@"MIDISyncSource"];
 }
-- (IBAction)showOpenWindow:(id)sender
-{
+- (IBAction)showOpenWindow:(id)sender {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
 	[openPanel setAllowedFileTypes:[NSArray arrayWithObject:@"seklayout"]];
-	[openPanel beginSheetModalForWindow:window completionHandler:^(NSInteger result){
+	[openPanel beginSheetModalForWindow:_window completionHandler:^(NSInteger result){
 		if(result == NSFileHandlingPanelOKButton)
 			[self performLoad:[[[openPanel URLs] objectAtIndex:0] path]];
 	}];
 }
 
-- (IBAction)loadSelected:(id)sender
-{
-	NSString *path = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[self.savedLayouts objectAtIndex:[self.layoutListTable selectedRow]]];
+- (IBAction)loadSelected:(id)sender {
+	NSString *path = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[_savedLayouts objectAtIndex:[_layoutListTable selectedRow]]];
 	[self performLoad:path];
 }
 
-- (void)performLoad:(NSString *)path
-{
+- (void)performLoad:(NSString *)path {
 	NSMutableArray *loadedSets;
 	NSMutableArray *loadedPatternSeqSteps;
 	NSDictionary *loadedData = [NSKeyedUnarchiver unarchiveObjectWithFile:path];
@@ -147,8 +141,7 @@
 	[[PSSequencer sharedSequencer] setActivePatternSet:[loadedSets objectAtIndex:0]];
 	[[PSSequencer sharedSequencer] updateLights];
 }
-- (void)saveToPath:(NSString *)path
-{
+- (void)saveToPath:(NSString *)path {
 	NSDictionary *forSaving = [NSDictionary dictionaryWithObjectsAndKeys:
 														 [[PSSequencer sharedSequencer] patternSets], @"patternSets",
 														 [PSSequencer sharedSequencer].patternSetSequencerSteps, @"patternSetSequencerSteps", nil];
@@ -158,21 +151,18 @@
 		NSRunAlertPanel(NSLocalizedString(@"saveErrorTitle", @"Save Error"), NSLocalizedString(@"saveErrorDescription", @"There was an error while trying to build the layout file for saving."), NSLocalizedString(@"love", @"Fuck!"), nil, nil);
 	
 }
-- (IBAction)performSave:(id)sender
-{
+- (IBAction)performSave:(id)sender {
 	NSSavePanel *savePanel = [NSSavePanel savePanel];
 	[savePanel setAllowedFileTypes:[NSArray arrayWithObject:@"seklayout"]];
-	[savePanel beginSheetModalForWindow:window completionHandler:^(NSInteger result){
+	[savePanel beginSheetModalForWindow:_window completionHandler:^(NSInteger result){
 		if(result == NSFileHandlingPanelOKButton)
 			[self saveToPath:[[savePanel URL] path]];
 	}];
 }
-- (IBAction)performSaveWithoutDialog:(id)sender
-{
+- (IBAction)performSaveWithoutDialog:(id)sender {
 	if(![[NSFileManager defaultManager] createDirectoryAtPath:LAYOUT_DIR_PATH
 														withIntermediateDirectories:YES
-																						 attributes:nil error:nil])
-	{
+																						 attributes:nil error:nil]) {
 		NSLog(@"Couldn't create layout directory");
 		return;
 	}
@@ -183,28 +173,26 @@
 	[self updateLayoutList];
 }
 
-- (IBAction)performDelete:(id)sender
-{
+- (IBAction)performDelete:(id)sender {
 	NSString *trashDir = [NSHomeDirectory() stringByAppendingPathComponent:@".Trash"];
 	
 	[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation
 																							 source:LAYOUT_DIR_PATH
 																					destination:trashDir
-																								files:[self.savedLayouts objectsAtIndexes:[NSIndexSet indexSetWithIndex:[self.layoutListTable selectedRow]]] 
+																								files:[_savedLayouts objectsAtIndexes:[NSIndexSet indexSetWithIndex:[_layoutListTable selectedRow]]] 
 																									tag:NULL];
 	[self updateLayoutList];
 }
 
-- (void)updateLayoutList
-{
+- (void)updateLayoutList {
 	self.savedLayouts = [NSMutableArray array];
 	NSArray *filenames;
 	if(!(filenames = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:LAYOUT_DIR_PATH error:nil]))
 		return;
 	// else
-	[self.savedLayouts addObjectsFromArray:filenames];
+	[_savedLayouts addObjectsFromArray:filenames];
 	// Sort
-	[self.savedLayouts sortUsingComparator:^(id a, id b)
+	[_savedLayouts sortUsingComparator:^(id a, id b)
 	 {
 		 NSString *aPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:a];
 		 NSString *bPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:b];
@@ -213,32 +201,28 @@
 		 
 		 return [[aAttrs objectForKey:NSFileModificationDate] compare:[bAttrs objectForKey:NSFileModificationDate]];
 	 }];
-	[self.layoutListTable reloadData];
+	[_layoutListTable reloadData];
 }
 
-- (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
-{
+- (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename {
 	[self performLoad:filename];
 	return YES;
 }
 
 #pragma mark -
 // Layout table datasource
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
-{
-	if(self.savedLayouts)
-		return [self.savedLayouts count];
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView {
+	if(_savedLayouts)
+		return [_savedLayouts count];
 	return 0;
 }
 - (id)tableView:(NSTableView *)aTableView 
 objectValueForTableColumn:(NSTableColumn *)column
-						row:(NSInteger)rowIndex
-{
+						row:(NSInteger)rowIndex {
 	if([[column identifier] isEqualToString:@"title"])
-		return [[self.savedLayouts objectAtIndex:rowIndex] stringByDeletingPathExtension];
-	else if([[column identifier] isEqualToString:@"creationDate"])
-	{
-		NSString *path = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[self.savedLayouts objectAtIndex:rowIndex]];
+		return [[_savedLayouts objectAtIndex:rowIndex] stringByDeletingPathExtension];
+	else if([[column identifier] isEqualToString:@"creationDate"]) {
+		NSString *path = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[_savedLayouts objectAtIndex:rowIndex]];
 		NSDictionary *attrs = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:NULL];
 		if(attrs)
 			return [attrs objectForKey:NSFileModificationDate];
@@ -248,9 +232,8 @@ objectValueForTableColumn:(NSTableColumn *)column
 - (void)tableView:(NSTableView *)aTableView
 	 setObjectValue:(id)newValue
 	 forTableColumn:(NSTableColumn *)aTableColumn
-							row:(NSInteger)rowIndex
-{
-	NSString *origPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[self.savedLayouts objectAtIndex:rowIndex]];
+							row:(NSInteger)rowIndex {
+	NSString *origPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[_savedLayouts objectAtIndex:rowIndex]];
 	NSString *destPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[newValue stringByAppendingPathExtension:@"seklayout"]];
 	[[NSFileManager defaultManager] moveItemAtPath:origPath toPath:destPath error:nil];
 	[self updateLayoutList];

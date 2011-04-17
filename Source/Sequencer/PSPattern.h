@@ -36,11 +36,11 @@
 
 
 @interface PSPattern : NSObject<NSCoding, NSCopying> {
-	NSMutableArray *steps;
+	NSMutableArray *_steps;
 
-	uint8_t note;
-	uint8_t channel;
-	BOOL muted;
+	uint8_t _note;
+	uint8_t _channel;
+	BOOL _muted;
 }
 @property(readwrite, retain) NSMutableArray *steps;
 @property(readwrite, assign) uint8_t note, channel;

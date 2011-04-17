@@ -57,52 +57,52 @@ typedef enum
 	// The number of steps is not meant to be changed, I'm only keeping things dynamic so that if
 	// anyone wants to implement support for a different controller than the PadKONTROL
 	// it will be less of a hassle
-	NSUInteger numberOfSteps; // Default 16
-	NSUInteger currentStep;   // Default 0
+	NSUInteger _numberOfSteps; // Default 16
+	NSUInteger _currentStep;   // Default 0
 	
-	PSSequencerView activeView;
-	BOOL isModal;
+	PSSequencerView _activeView;
+	BOOL _isModal;
 	
-	BOOL isActive; // Are we stepping?
+	BOOL _isActive; // Are we stepping?
 	
-	BOOL velocityEnabled; // Do we use the velocity of the strike used to enable a pad?
+	BOOL _velocityEnabled; // Do we use the velocity of the strike used to enable a pad?
 	
-	NSMutableArray *patternSets;
-	PSPatternSet *activePatternSet;
+	NSMutableArray *_patternSets;
+	PSPatternSet *_activePatternSet;
 		
 	// MIDI interface
-	SMVirtualOutputStream *virtualOutputStream;
+	SMVirtualOutputStream *_virtualOutputStream;
 	
 	// For copying pattern sets
-	BOOL performingCopy;
-	NSUInteger currentCopySource;
+	BOOL _performingCopy;
+	NSUInteger _currentCopySource;
 	
 	// For changing notes of patterns
-	BOOL inNoteChangeMode;
+	BOOL _inNoteChangeMode;
 	// For changing channels of patterns
-	BOOL inChannelChangeMode;
+	BOOL _inChannelChangeMode;
 	
 	// Indicates wether the shift button is held (setting button)
-	BOOL shiftButtonHeld;
+	BOOL _shiftButtonHeld;
 	
 	// The pattern sequencer 
 	// A sequencer on top of the sequencer really.
 	// Allows you to specify patterns to play in an order. This is done independently of what pattern you are editing
 	// Using this you could also create a 1 step pattern sequencer,
 	// and then create a new pattern while the pattern sequencer plays pattern
-	BOOL inPatternSetSequencingMode;
-	NSMutableArray *patternSetSequencerSteps;
-	NSUInteger currentPatSetSeqStep;
+	BOOL _inPatternSetSequencingMode;
+	NSMutableArray *_patternSetSequencerSteps;
+	NSUInteger _currentPatSetSeqStep;
 	
 	// The pattern sequencer editor view state
 	
 	// If NO the user is meant to select a step to add to the sequencer
 	// If YES he's meant to select a destination position in the sequence
-	BOOL patSetSeqViewPlaceMode;
-	NSUInteger patSetSeq_stepToPlace;
+	BOOL _patSetSeqViewPlaceMode;
+	NSUInteger _patSetSeq_stepToPlace;
 	
 	// An array of ON midi notes that need an OFF message to be sent
-	NSMutableArray *midiMessagesAlive;
+	NSMutableArray *_midiMessagesAlive;
 }
 @property(readwrite, assign) BOOL isActive;
 

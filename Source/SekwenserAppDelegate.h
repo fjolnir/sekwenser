@@ -37,12 +37,12 @@
 @class PSPadKontrol;
 
 @interface SekwenserAppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource> {
-	NSWindow *window;
+	NSWindow *_window;
 	
-	IBOutlet NSPopUpButton *syncSourcePopupBtn;
+	IBOutlet NSPopUpButton *_syncSourcePopupBtn;
 	
-	NSMutableArray *savedLayouts;
-	IBOutlet NSTableView *layoutListTable;
+	NSMutableArray *_savedLayouts;
+	IBOutlet NSTableView *_layoutListTable;
 	
 }
 

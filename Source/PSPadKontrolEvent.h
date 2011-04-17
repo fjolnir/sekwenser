@@ -58,32 +58,37 @@ typedef enum {
 
 
 
-@interface PSPadKontrolEvent : NSObject {
-	PSPadKontrolEventType type;
-	PSPadKontrolVelocity velocity; // Only set for pad events
+@interface PSPadKontrolEvent : NSObject {  
+  PSPadKontrol *_device;
+
+	PSPadKontrolEventType _type;
+	PSPadKontrolVelocity _velocity; // Only set for pad events
 	
-	PSPadKontrolValue *values;
-	NSUInteger numberOfValues;
+	PSPadKontrolValue *_values;
+	NSUInteger _numberOfValues;
 	
-	NSInteger affectedPad; // Only set for pad events
-	uint8_t affected_entity_code;
+	NSInteger _affectedPad; // Only set for pad events
+	uint8_t _affected_entity_code;
 }
+@property(readonly) PSPadKontrol *device;
 @property(readonly) PSPadKontrolEventType type;
 @property(readonly) PSPadKontrolVelocity velocity;
 @property(readonly) PSPadKontrolValue *values;
 @property(readonly) NSUInteger numberOfValues;
 @property(readonly) NSInteger affectedPad;
 @property(readonly) uint8_t affected_entity_code;
-+ (PSPadKontrolEvent *)eventWithType:(PSPadKontrolEventType)inType
-														velocity:(PSPadKontrolVelocity)inVelocity 
-															values:(PSPadKontrolValue *)inValues
-											numberOfValues:(NSUInteger)numberOfInValues
-												 affectedPad:(NSInteger)inAffectedPad
-									affectedEntityCode:(uint8_t)inAffected_entity_code;
-- (id)initWithType:(PSPadKontrolEventType)inType
-					velocity:(PSPadKontrolVelocity)inVelocity 
-						values:(PSPadKontrolValue *)inValues
-		numberOfValues:(NSUInteger)numberOfInValues
-			 affectedPad:(NSInteger)inAffectedPad
++ (PSPadKontrolEvent *)eventWithDevice:(PSPadKontrol *)inDevice
+                                  type:(PSPadKontrolEventType)inType
+                              velocity:(PSPadKontrolVelocity)inVelocity 
+                                values:(PSPadKontrolValue *)inValues
+                        numberOfValues:(NSUInteger)numberOfInValues
+                           affectedPad:(NSInteger)inAffectedPad
+                    affectedEntityCode:(uint8_t)inAffected_entity_code;
+- (id)initWithDevice:(PSPadKontrol *)inDevice
+                type:(PSPadKontrolEventType)inType
+            velocity:(PSPadKontrolVelocity)inVelocity 
+              values:(PSPadKontrolValue *)inValues
+      numberOfValues:(NSUInteger)numberOfInValues
+         affectedPad:(NSInteger)inAffectedPad
 	affectedEntityCode:(uint8_t)inAffected_entity_code;
 @end

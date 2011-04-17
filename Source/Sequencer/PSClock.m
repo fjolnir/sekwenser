@@ -46,10 +46,9 @@ PSClock *sharedInstance;
 static void MIDIInputProc(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon);
 static void clockListener(void *userData, CAClockMessage message, const void *param);
 @implementation PSClock
-@synthesize pulseInterval, listeners, caClock;
+@synthesize pulseInterval=_pulseInterval, listeners=_listeners, caClock=_caClock;
 
-+ (PSClock *)globalClock
-{
++ (PSClock *)globalClock {
 	@synchronized(self)
 	{
 		if(!sharedInstance)
@@ -59,15 +58,14 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 }
 
 
-- (id)init
-{
+- (id)init {
 	if(!(self = [super init]))
 		return nil;
 		
 	OSErr err = 0;
 	
 	NSString *clientName = @"sekwenser";
-	err = MIDIClientCreate((CFStringRef)clientName, NULL, NULL, &clientRef);
+	err = MIDIClientCreate((CFStringRef)clientName, NULL, NULL, &_clientRef);
 	if (err != noErr) {
 		NSLog(@"MIDIClientCreate err = %d", err);
 	}
@@ -76,12 +74,12 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 	
 	//
 	// Set up the CoreAudio Clock
-	CAClockNew(0, &caClock);
+	CAClockNew(0, &_caClock);
 	
-	CAClockAddListener(caClock, clockListener, self);
+	CAClockAddListener(_caClock, clockListener, self);
 		
 	CAClockTimebase timebase = kCAClockTimebase_HostTime;
-	err = CAClockSetProperty(caClock, kCAClockProperty_InternalTimebase, sizeof(CAClockTimebase), &timebase);
+	err = CAClockSetProperty(_caClock, kCAClockProperty_InternalTimebase, sizeof(CAClockTimebase), &timebase);
 	if(err)
 		NSLog(@"Error setting clock timebase");
 	
@@ -90,28 +88,28 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 
 	
 	UInt32 SMPTEType = kSMPTETimeType24;
-	err = CAClockSetProperty(caClock, kCAClockProperty_SMPTEFormat, sizeof(CAClockSMPTEFormat), &SMPTEType);
+	err = CAClockSetProperty(_caClock, kCAClockProperty_SMPTEFormat, sizeof(CAClockSMPTEFormat), &SMPTEType);
 	if(err)
 		NSLog(@"Error setting clock SMPTE type");
 	
 	// Create a midi port
 	NSString *inputPortName = @"sekwenser in";
-	err = MIDIInputPortCreate(clientRef, (CFStringRef)inputPortName, 
-														MIDIInputProc, self, &inputPortRef);
+	err = MIDIInputPortCreate(_clientRef, (CFStringRef)inputPortName, 
+														MIDIInputProc, self, &_inputPortRef);
 	if (err != noErr) {
 		NSLog(@"MIDIInputPortCreate err = %d", err);
 	}
 	
 	// Connect the endpoint to our port
-	err = MIDIPortConnectSource(inputPortRef, srcPointRef, NULL);
+	err = MIDIPortConnectSource(_inputPortRef, _srcPointRef, NULL);
 	if (err)
 		NSLog(@"MIDIPortConnectSource err = %d", err);
 		
 	// Not running at the start now are we?
-	running = NO;
+	_running = NO;
 	
-	self.pulseInterval = 0.25; // default to 1/4
-	self.listeners = [NSMutableArray array];
+	_pulseInterval = 0.25; // default to 1/4
+	_listeners = [[NSMutableArray alloc] init];
 	
 	
 	return self;
@@ -120,38 +118,36 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 
 #pragma mark -
 // Status change methods
-- (void)start
-{
+- (void)start {
 	// We can't call CAClockStart if the clock is already running
 	// That causes an infinite recursion (on this method) so we make sure not to.
 	// When the clock is started from a midi source the running variable should be assigned to YES
 	// before -(void)start is executed
-	if(!running)
-		CAClockStart(caClock);
-	running = YES;
+	if(!_running)
+		CAClockStart(_caClock);
+	_running = YES;
 	
 	// Polling like this is dirty but I see no other way of knowing when a beat hits.
 	// There's no notification mechanism in the CAClock api
 	// Someone please rewrite this to not do any polling
-	beatCheckBlock = ^{
+	_beatCheckBlock = ^{
 		// Get the reference beat time used to find when the next beat hits
 		CAClockTime originalBeatTime;
-		CAClockGetCurrentTime(caClock, kCAClockTimeFormat_Beats, &originalBeatTime);
+		CAClockGetCurrentTime(_caClock, kCAClockTimeFormat_Beats, &originalBeatTime);
 		 // Make sure we're incrementing a whole beat
 		originalBeatTime.time.beats = roundl(originalBeatTime.time.beats);
 		
 		// Core audio clock seems to always be 26ms behind so we offset by -26ms
 		uint64_t offset = 26*(NSEC_PER_SEC/1000);
 		
-		while(running)
-		{
+		while(_running) {
 			// Notify all who are interested
 			[self sendSelectorToListeners:@selector(clockPulseHappened:)];
 			
 			// Sleep until the next time we want to pulse
-			originalBeatTime.time.beats += pulseInterval;
+			originalBeatTime.time.beats += _pulseInterval;
 			CAClockTime nextBeatTime;
-			CAClockTranslateTime(caClock, &originalBeatTime, kCAClockTimeFormat_HostTime, &nextBeatTime);
+			CAClockTranslateTime(_caClock, &originalBeatTime, kCAClockTimeFormat_HostTime, &nextBeatTime);
 		//	NSLog(@"%llu - %llu = %llu", nextBeatTime.time.hostTime, offset, nextBeatTime.time.hostTime - offset);
 			mach_wait_until(nextBeatTime.time.hostTime - offset);
 		}
@@ -160,90 +156,78 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 	// Run the clock polling thread
 	dispatch_queue_t q_default;
 	q_default = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0);
-	dispatch_async(q_default, beatCheckBlock);
+	dispatch_async(q_default, _beatCheckBlock);
 	
 	[self sendSelectorToListeners:@selector(clockDidStart:)];
 }
-- (void)stop
-{
-	CAClockStop(caClock);
-	running = NO;
+- (void)stop {
+	CAClockStop(_caClock);
+	_running = NO;
 	[self sendSelectorToListeners:@selector(clockDidStop:)];
 }
-- (void)arm
-{
-	//
+- (void)arm {
 	// Arm the clock and go!
 	OSErr err = 0;
-	err = CAClockArm(caClock);
+	err = CAClockArm(_caClock);
 	if(err)
 		NSLog(@"Couldn't arm clock!");
 }
-- (void)disarm
-{
+- (void)disarm {
 	[self stop];
 	OSErr err = 0;
-	err = CAClockDisarm(caClock);
+	err = CAClockDisarm(_caClock);
 	if(err)
 		NSLog(@"Couldn't disarm clock!");
 }
 
-- (void)setInternalBPM:(CAClockTempo)inTempo
-{
+- (void)setInternalBPM:(CAClockTempo)inTempo {
 	OSErr err;
-	internalBPM = inTempo;
+	_internalBPM = inTempo;
 	
 	// Create a 4/4 tempo map with the passed bpm
 	CATempoMapEntry tempoMap;
 	tempoMap.beats = 4.0;
-	tempoMap.tempoBPM = internalBPM;
-	err = CAClockSetProperty(caClock, kCAClockProperty_TempoMap, sizeof(CATempoMapEntry), &tempoMap);
+	tempoMap.tempoBPM = _internalBPM;
+	err = CAClockSetProperty(_caClock, kCAClockProperty_TempoMap, sizeof(CATempoMapEntry), &tempoMap);
 	if(err)
-		NSLog(@"Error setting clock tempomap (in %f err %d)", internalBPM, err);
+		NSLog(@"Error setting clock tempomap (in %f err %d)", _internalBPM, err);
 }
-- (CAClockTempo)internalBPM
-{
-	return internalBPM;
+- (CAClockTempo)internalBPM {
+	return _internalBPM;
 }
-- (void)setSyncMode:(CAClockSyncMode)syncMode
-{
+- (void)setSyncMode:(CAClockSyncMode)syncMode {
 	OSErr err;
-	err = CAClockSetProperty(caClock, kCAClockProperty_SyncMode, sizeof(CAClockSyncMode), &syncMode);
+	err = CAClockSetProperty(_caClock, kCAClockProperty_SyncMode, sizeof(CAClockSyncMode), &syncMode);
 	if(err)
 		NSLog(@"Error setting clock syncmode");	
 }
-- (void)setMIDISyncSource:(NSString *)name
-{
+- (void)setMIDISyncSource:(NSString *)name {
 	OSErr err;
 	CFStringRef srcDisplayName;
 	unsigned numberOfSources = MIDIGetNumberOfSources();
-	if(numberOfSources == 0)
-	{
+	if(numberOfSources == 0) {
 		NSLog(@"No MIDI sources found!");
 		return;
 	}
 	
 	// if no source name is passed, just use the first one
 	MIDIEndpointRef currPoint;
-	if(!name)
-	{
-		currPoint= MIDIGetSource(0);
+	if(!name) {
+		_srcPointRef = MIDIGetSource(0);
 		return;
 	}
 	
 	currPoint = NULL;
-	for(int i = 0; i < numberOfSources; ++i)
-	{
+	for(int i = 0; i < numberOfSources; ++i) {
 		currPoint = MIDIGetSource(i);
 		err = MIDIObjectGetStringProperty(currPoint, kMIDIPropertyDisplayName, &srcDisplayName);
 		if (err) 
 			NSLog(@"MIDI Get sourceName err = %d", err);
 				
-		if([(NSString *)srcDisplayName isEqualToString:name])
-		{
+		if([(NSString *)srcDisplayName isEqualToString:name]) {
 			// Tell the CoreAudio clock to use the source
-			srcPointRef = currPoint;
-			err = CAClockSetProperty(caClock, kCAClockProperty_SyncSource, sizeof(srcPointRef), &srcPointRef);
+			_srcPointRef = currPoint;
+			err = CAClockSetProperty(_caClock, kCAClockProperty_SyncSource, sizeof(_srcPointRef), &_srcPointRef);
 			if(err)
 				NSLog(@"Error setting clock midi sync source %d", err);	
 			NSLog(@"connect = %@", srcDisplayName);
@@ -254,37 +238,33 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 	}
 	// If we dont find the wanted one fall back on the first one
 	if(!currPoint)
-		currPoint= MIDIGetSource(0);
+		_srcPointRef = MIDIGetSource(0);
 }
 
 #pragma mark -
 // Status query methods
 
-- (CAClockBeats)currentBeat
-{
+- (CAClockBeats)currentBeat {
 	CAClockTime beatTime;
-	CAClockGetCurrentTime(caClock, kCAClockTimeFormat_Beats, &beatTime);
+	CAClockGetCurrentTime(_caClock, kCAClockTimeFormat_Beats, &beatTime);
 	
 	return beatTime.time.beats;
 }
-- (CAClockTempo)currentBPM
-{
+- (CAClockTempo)currentBPM {
 	CAClockTempo tempo; // Internal tempo
 	CAClockTime  timestamp;
-	CAClockGetCurrentTempo(caClock, &tempo, &timestamp);
+	CAClockGetCurrentTempo(_caClock, &tempo, &timestamp);
 	// We have to multiply the internal BPM with the playback rate to get the actual playback BPM
 	Float64 playrate;
-	CAClockGetPlayRate(caClock, &playrate);
+	CAClockGetPlayRate(_caClock, &playrate);
 	tempo *= playrate; // The synced tempo
 	
 	return tempo;
 }
 
 // Makes the clock pulse listeners perform a selector
-- (void)sendSelectorToListeners:(SEL)selector
-{
-	for(id<NSObject,PSClockListener>listener in self.listeners)
-	{
+- (void)sendSelectorToListeners:(SEL)selector {
+	for(id<NSObject,PSClockListener>listener in _listeners) {
 		if([listener respondsToSelector:selector])
 			[listener performSelector:selector withObject:self];
 	}
@@ -293,14 +273,13 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 // CoreAudio Clock handling
 
 // Receives status change notifications from the CoreAudio Clock
-- (void)clockListener:(CAClockMessage)message parameter:(const void *)param
-{
+- (void)clockListener:(CAClockMessage)message parameter:(const void *)param {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	
 	switch (message) {
 		case kCAClockMessage_Started:
 			NSLog(@"Clock started");
-			running = YES;
+			_running = YES;
 			[self start];
 			break;
 		case kCAClockMessage_Stopped:
@@ -329,26 +308,23 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 
 // These 2 methods handle setting the absolute timecode when it's received
 // Not really tested since I've never had to use it, but should work
-- (void)setCurrentTime:(NSNumber *)secondsNumber
-{
+- (void)setCurrentTime:(NSNumber *)secondsNumber {
 	NSLog(@"set current time code?");
 	CAClockSeconds seconds = [secondsNumber doubleValue];
-	if (!running) {
-		
+	if(!_running) {
 		CAClockTime time;
 		time.format = kCAClockTimeFormat_Seconds;
 		time.time.seconds = seconds;
 		
-		OSStatus err = CAClockSetCurrentTime(caClock, &time);
+		OSStatus err = CAClockSetCurrentTime(_caClock, &time);
 		if (err != noErr)
 			NSLog(@"set setCurrentTime err");
 	}
 	else
-		keepSeconds = seconds;
+		_keepSeconds = seconds;
 }
 
-- (void)setFullTimecode:(MIDIPacket *)packet
-{
+- (void)setFullTimecode:(MIDIPacket *)packet {
 	OSStatus err;
 	
 	SMPTETime smpteTime;
@@ -361,9 +337,9 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 	smpteTime.mSubframes = 0;
 	
 	CAClockSeconds seconds;
-	err = CAClockSMPTETimeToSeconds(caClock, &smpteTime, &seconds);
+	err = CAClockSMPTETimeToSeconds(_caClock, &smpteTime, &seconds);
 	if (err != noErr) {
-		NSLog(@"SMPTETimeToSecond err = %d", err);
+		NSLog(@"SMPTETimeToSecond err = %d", (int)err);
 		return;
 	}
 	
@@ -376,8 +352,7 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 
 #pragma mark -
 // Singleton stuff
-+ (id)allocWithZone:(NSZone *)zone
-{
++ (id)allocWithZone:(NSZone *)zone {
 	@synchronized(self) {
 		if (sharedInstance == nil) {
 			sharedInstance = [super allocWithZone:zone];
@@ -387,54 +362,48 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 	return nil; //on subsequent allocation attempts return nil
 }
 
-- (id)copyWithZone:(NSZone *)zone
-{
+- (id)copyWithZone:(NSZone *)zone {
 	return self;
 }
 
-- (id)retain
-{
+- (id)retain {
 	return self;
 }
 
-- (unsigned)retainCount
-{
+- (unsigned)retainCount {
 	return UINT_MAX;  // Cannot be released
 }
 
-- (void)release
-{
+- (void)release {
 	// Do nothing
 }
 
-- (id)autorelease
-{
+- (id)autorelease {
 	return self;
 }
 
-
-- (void)dealloc
-{
+- (void)dealloc {
 	OSStatus err;
 	
-	err = MIDIPortDisconnectSource(inputPortRef, srcPointRef);
+	err = MIDIPortDisconnectSource(_inputPortRef, _srcPointRef);
 	if (err != noErr) NSLog(@"MIDIPortDisconnectSource Err"); 
-	err = MIDIPortDispose(inputPortRef);
+	err = MIDIPortDispose(_inputPortRef);
 	if (err != noErr) NSLog(@"MIDIPortDispose Err");
-	err = MIDIClientDispose(clientRef);
+	err = MIDIClientDispose(_clientRef);
 	if (err != noErr) NSLog(@"MIDIClientDispose Err");
 	
-	err = CAClockDisarm(caClock);
+	err = CAClockDisarm(_caClock);
 	if (err != noErr) NSLog(@"clock disarm Err");
-	err = CAClockDispose(caClock);
+	err = CAClockDispose(_caClock);
 	if (err != noErr) NSLog(@"CAClockDispose err");
+  
+  [_listeners release];
 	
 	[super dealloc];
 }	
 @end
 
-static void MIDIInputProc(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon)
-{
+static void MIDIInputProc(const MIDIPacketList *pktlist, void *readProcRefCon, void *srcConnRefCon) {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	// Make a pointer to the first packet
 	MIDIPacket *packet = (MIDIPacket *)&(pktlist->packet[0]);
@@ -446,8 +415,7 @@ static void MIDIInputProc(const MIDIPacketList *pktlist, void *readProcRefCon, v
 				(packet->data[1] == 0x7F) && 
 				(packet->data[2] == 0x7F) && 
 				(packet->data[3] == 0x01) && 
-				(packet->data[4] == 0x01))
-		{
+				(packet->data[4] == 0x01)) {
 			[(id)readProcRefCon setFullTimecode:packet];
 		}
 		
@@ -459,7 +427,6 @@ static void MIDIInputProc(const MIDIPacketList *pktlist, void *readProcRefCon, v
 }
 
 // Just forwards the message to the instance method
-static void clockListener(void *userData, CAClockMessage message, const void *param)
-{
+static void clockListener(void *userData, CAClockMessage message, const void *param) {
 	[(id)userData clockListener:message parameter:param];
 }

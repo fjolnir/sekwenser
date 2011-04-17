@@ -60,43 +60,39 @@ static PSSequencer *sharedSequencer = nil;
 #pragma mark -
 
 @implementation PSSequencer
-@synthesize patternSets, numberOfSteps, activePatternSet, virtualOutputStream, currentStep, inPatternSetSequencingMode, patternSetSequencerSteps, currentPatSetSeqStep, patSetSeqViewPlaceMode, patSetSeq_stepToPlace, activeView, isModal, shiftButtonHeld, velocityEnabled, inNoteChangeMode, inChannelChangeMode, isActive;
+@synthesize patternSets=_patternSets, numberOfSteps=_numberOfSteps, activePatternSet=_activePatternSet, virtualOutputStream=_virtualOutputStream, currentStep=_currentStep, inPatternSetSequencingMode=_inPatternSetSequencingMode, patternSetSequencerSteps=_patternSetSequencerSteps, currentPatSetSeqStep=_currentPatSetSeqStep, patSetSeqViewPlaceMode=_patSetSeqViewPlaceMode, patSetSeq_stepToPlace=_patSetSeq_stepToPlace, activeView=_activeView, isModal=_isModal, shiftButtonHeld=_shiftButtonHeld, velocityEnabled=_velocityEnabled, inNoteChangeMode=_inNoteChangeMode, inChannelChangeMode=_inChannelChangeMode, isActive=_isActive;
 
-+ (PSSequencer *)sharedSequencer
-{
++ (PSSequencer *)sharedSequencer {
 	if(!sharedSequencer)
 		sharedSequencer = [[self alloc] init];
 	
 	return [[sharedSequencer retain] autorelease];
 }
-
-- (id)init
-{
+- (id)init {
 	if(!(self = [super init]))
 		 return nil;
 	
 	[self resetSequencer];
 	
-	self.isActive = YES;
-	self.activeView = PSSequencerSequencerView;
-	self.velocityEnabled = NO;
-	self.isModal = NO;
+	_isActive = YES;
+	_activeView = PSSequencerSequencerView;
+	_velocityEnabled = NO;
+	_isModal = NO;
 	
-	midiMessagesAlive = [[NSMutableArray alloc] init];
+	_midiMessagesAlive = [[NSMutableArray alloc] init];
 	
-	self.patternSetSequencerSteps = [NSMutableArray array];
+	_patternSetSequencerSteps = [[NSMutableArray alloc] init];
 
 	// Create the patterns
-	self.patternSets = [NSMutableArray array];
-	for(int i = 0; i < 16; ++i)
-	{
-		[self.patternSets addObject:[PSPatternSet patternSetWithEmptyPatterns:16 activePattern:0]];
+	_patternSets = [[NSMutableArray alloc] init];
+	for(int i = 0; i < 16; ++i) {
+		[_patternSets addObject:[PSPatternSet patternSetWithEmptyPatterns:16 activePattern:0]];
 	}
-	self.activePatternSet = [self.patternSets objectAtIndex:0];
+	self.activePatternSet = [_patternSets objectAtIndex:0];
 	
 	//
 	// Create a virtual output port (for sending notes to software)
-	virtualOutputStream = [[SMVirtualOutputStream alloc] initWithName:@"sekwenser out" uniqueID:0];
+	_virtualOutputStream = [[SMVirtualOutputStream alloc] initWithName:@"sekwenser out" uniqueID:0];
 	
 	// Initialize the padkontrol
 	[[[PSPadKontrol sharedPadKontrol] eventListeners] addObject:self];
@@ -109,27 +105,32 @@ static PSSequencer *sharedSequencer = nil;
 	
 	return self;
 }
-
-- (void)resetSequencer
-{
-	self.currentStep = 0;
+- (void)dealloc {
+	[_midiMessagesAlive release];
+  [_patternSets release];
+  [_activePatternSet release];
+  [_virtualOutputStream release];
+  [_patternSetSequencerSteps release];
+	
+	[super dealloc];
 }
 
-- (void)performStep
-{	
-	if(!isActive)
+- (void)resetSequencer {
+	_currentStep = 0;
+}
+
+- (void)performStep {	
+	if(!_isActive)
 		return;
 	NSMutableArray *midiMessages = [NSMutableArray array];
 	
-	PSPatternSet *patternSet = activePatternSet;
+	PSPatternSet *patternSet = _activePatternSet;
 	// If in pattern set sequencing mode we play the currently active pattern set
-	if(inPatternSetSequencingMode)
-	{
+	if(_inPatternSetSequencingMode) {
 		NSNumber *setIndex;
-		if(currentPatSetSeqStep < [patternSetSequencerSteps count])
-		{
-			setIndex = [patternSetSequencerSteps objectAtIndex:currentPatSetSeqStep];
-			patternSet = [patternSets objectAtIndex:[setIndex intValue]];
+		if(_currentPatSetSeqStep < [_patternSetSequencerSteps count]) {
+			setIndex = [_patternSetSequencerSteps objectAtIndex:_currentPatSetSeqStep];
+			patternSet = [_patternSets objectAtIndex:[setIndex intValue]];
 		}
 		else
 			return; // nothing to play
@@ -137,21 +138,18 @@ static PSSequencer *sharedSequencer = nil;
 	
 	
 	// Turn off all notes currently on
-	for(SMVoiceMessage *aMsg in midiMessagesAlive)
-	{
+	for(SMVoiceMessage *aMsg in _midiMessagesAlive) {
 		[aMsg setStatus:SMVoiceMessageStatusNoteOff];
 		[aMsg setDataByte2:0x00];
 		[midiMessages addObject:aMsg];
 	}
-	[midiMessagesAlive removeAllObjects];
+	[_midiMessagesAlive removeAllObjects];
 	
 	Byte noteData[2] = {0x00, 0x00};
-	for(PSPattern *pattern in patternSet.patterns)
-	{
+	for(PSPattern *pattern in patternSet.patterns) {
 		// Send the note  for the active step
-		PSStep *step = [pattern.steps objectAtIndex:currentStep];
-		if(![patternSet.mutedSteps containsIndex:currentStep] && step.enabled)
-		{	
+		PSStep *step = [pattern.steps objectAtIndex:_currentStep];
+		if(![patternSet.mutedSteps containsIndex:_currentStep] && step.enabled) {	
 			noteData[0] = pattern.note;
 			noteData[1] = step.velocity;
 			
@@ -161,138 +159,120 @@ static PSSequencer *sharedSequencer = nil;
 																																	 length:2];
 			[message setChannel:pattern.channel];
 			[midiMessages addObject:message];
-			[midiMessagesAlive addObject:message];
+			[_midiMessagesAlive addObject:message];
 		}
 	}
-	[virtualOutputStream takeMIDIMessages:midiMessages];
+	[_virtualOutputStream takeMIDIMessages:midiMessages];
 
 	// If we're in the sequencer view we flash the current step
 	// Unless it's muted, in which case it'll be skipped over
-	if(self.activeView == PSSequencerSequencerView)
-	{
-		uint8_t lightCode = kPadOn_codes[currentStep];
+	if(_activeView == PSSequencerSequencerView) {
+		uint8_t lightCode = kPadOn_codes[_currentStep];
 		uint8_t lightState = kPad_shortOneshot_code+0x02; // add 2 to make the flash slightly longer
 		[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode state:&lightState];
 	}
-	else if(self.activeView == PSSequencerPatternSetSequencerView && self.inPatternSetSequencingMode)
-	{
+	else if(_activeView == PSSequencerPatternSetSequencerView && _inPatternSetSequencingMode) {
 		// In pattern set sequencer view the blinking is handled, in updateLights
 		// Reason being if we don't update/maintain the blink status after updating the lights, things'll look ugly
 		[self updateLights];
 	}
 	
 	// Increment the step
-	if(++self.currentStep > 15)
-	{
-		self.currentStep = 0;
-		if(++self.currentPatSetSeqStep >= [patternSetSequencerSteps count])
-			self.currentPatSetSeqStep = 0;
+	if(++_currentStep > 15) {
+		_currentStep = 0;
+		if(++_currentPatSetSeqStep >= [_patternSetSequencerSteps count])
+			_currentPatSetSeqStep = 0;
 	}
 }
 
-- (void)selectView:(PSSequencerView)view
-{
-	if(self.activeView == PSSequencerSequencerView || view == PSSequencerSequencerView)
-	{
-		self.activeView = view;
+- (void)selectView:(PSSequencerView)view {
+	if(_activeView == PSSequencerSequencerView || view == PSSequencerSequencerView) {
+		_activeView = view;
 		[self updateLights];
 	}
 }
 
 #pragma mark -
 // PadKontrol communication
-- (void)padKontrolEventReceived:(PSPadKontrolEvent *)event fromPadKontrol:(PSPadKontrol *)padKontrol
-{
+- (void)padKontrolEventReceived:(PSPadKontrolEvent *)event fromPadKontrol:(PSPadKontrol *)padKontrol {
 	//NSLog(@"Received event from PadKontrol: %@", event);
 
-	PSPattern *activePattern = [activePatternSet activePattern];
-	if([event type] == PSPadKontrolEnteredNativeMode)
-	{
+	PSPattern *activePattern = [_activePatternSet activePattern];
+	if([event type] == PSPadKontrolEnteredNativeMode) {
 		[self selectView:PSSequencerSequencerView];
-		self.isModal = NO;
+		_isModal = NO;
 		[self updateLights];
 	}
-	else if([event type] == PSPadKontrolPadPressEventType)
-	{
+	else if([event type] == PSPadKontrolPadPressEventType) {
 		// If this is positive at the end of the block, the lights on the controller will be refreshed
 		BOOL updateLights = YES;
 		
-		if(activeView == PSSequencerSequencerView)
-		{
+		if(_activeView == PSSequencerSequencerView) {
 			PSStep *step = [[activePattern steps] objectAtIndex:event.affectedPad];
 			
 			step.enabled = !step.enabled;
-			if(velocityEnabled)
+			if(_velocityEnabled)
 				step.velocity = event.velocity;
 			[[PSPadKontrol sharedPadKontrol] setLEDNumber:step.velocity blink:NO];
 		}
-		else if(activeView == PSSequencerPatternSelectView)
-		{
-			activePatternSet.activePattern = [activePatternSet.patterns objectAtIndex:event.affectedPad];
+		else if(_activeView == PSSequencerPatternSelectView) {
+			_activePatternSet.activePattern = [_activePatternSet.patterns objectAtIndex:event.affectedPad];
 		}
-		else if(activeView == PSSequencerStepMuteView)
-		{
-			if([activePatternSet.mutedSteps containsIndex:event.affectedPad])
-				[activePatternSet.mutedSteps removeIndex:event.affectedPad];
+		else if(_activeView == PSSequencerStepMuteView) {
+			if([_activePatternSet.mutedSteps containsIndex:event.affectedPad])
+				[_activePatternSet.mutedSteps removeIndex:event.affectedPad];
 			else
-				[activePatternSet.mutedSteps addIndex:event.affectedPad];
+				[_activePatternSet.mutedSteps addIndex:event.affectedPad];
 			 
 		}
-		else if(activeView == PSSequencerPatternSetSelectView)
-		{
-			self.activePatternSet = [patternSets objectAtIndex:event.affectedPad];
+		else if(_activeView == PSSequencerPatternSetSelectView) {
+			self.activePatternSet = [_patternSets objectAtIndex:event.affectedPad];
 		}
-		else if(activeView == PSSequencerPatternCopyView)
-		{
+		else if(_activeView == PSSequencerPatternCopyView) {
 			updateLights = NO;
-			if(!performingCopy)
+			if(!_performingCopy)
 			{
 				uint8_t lightCode = kPadOn_codes[event.affectedPad];
 				[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode
 																								state:(uint8_t *)&kPad_blink_code];
-				currentCopySource = event.affectedPad;
-				performingCopy = YES;
+				_currentCopySource = event.affectedPad;
+				_performingCopy = YES;
 			}
-			else
-			{
+			else {
 				// Peform the actual copy
-				PSPatternSet *setToCopy = [self.patternSets objectAtIndex:currentCopySource];
-				PSPatternSet *destinationSet = [self.patternSets objectAtIndex:event.affectedPad];
+				PSPatternSet *setToCopy = [_patternSets objectAtIndex:_currentCopySource];
+				PSPatternSet *destinationSet = [_patternSets objectAtIndex:event.affectedPad];
 				[destinationSet copyPatternSet:setToCopy];
 				// Update the lights
-				uint8_t sourceLightCode = kPadOn_codes[currentCopySource];
+				uint8_t sourceLightCode = kPadOn_codes[_currentCopySource];
 				uint8_t destLightCode   = kPadOn_codes[event.affectedPad];
 				[[PSPadKontrol sharedPadKontrol] controlLight:&sourceLightCode
 																								state:(uint8_t *)&kPad_lightOn_code];
 				[[PSPadKontrol sharedPadKontrol] controlLight:&destLightCode
 																								state:(uint8_t *)&kPad_shortOneshot_code];
-				performingCopy = NO;
+				_performingCopy = NO;
 			}
 		}
-		else if(activeView == PSSequencerPatternSetSequencerView)
-		{
+		else if(_activeView == PSSequencerPatternSetSequencerView) {
 			NSUInteger index = event.affectedPad;
 			
-			if(shiftButtonHeld)
-			{
-				if(index < [patternSetSequencerSteps count])
-				{
-					if(index == [patternSetSequencerSteps count]);
-						 currentPatSetSeqStep = 0;
-					[self.patternSetSequencerSteps removeObjectAtIndex:index];
+			if(_shiftButtonHeld) {
+				if(index < [_patternSetSequencerSteps count]) {
+					if(index == [_patternSetSequencerSteps count])
+						 _currentPatSetSeqStep = 0;
+					[_patternSetSequencerSteps removeObjectAtIndex:index];
 				}
-				self.patSetSeqViewPlaceMode = NO;
+				_patSetSeqViewPlaceMode = NO;
 			}
-			if(self.patSetSeqViewPlaceMode)
-			{
-				if(index < [patternSetSequencerSteps count])
-					[patternSetSequencerSteps replaceObjectAtIndex:index withObject:[NSNumber numberWithInt:self.patSetSeq_stepToPlace]];
-				else if(index == [patternSetSequencerSteps count])
-					[patternSetSequencerSteps addObject:[NSNumber numberWithInt:self.patSetSeq_stepToPlace]];
+			if(_patSetSeqViewPlaceMode) {
+				if(index < [_patternSetSequencerSteps count])
+					[_patternSetSequencerSteps replaceObjectAtIndex:index withObject:[NSNumber numberWithInt:_patSetSeq_stepToPlace]];
+				else if(index == [_patternSetSequencerSteps count])
+					[_patternSetSequencerSteps addObject:[NSNumber numberWithInt:_patSetSeq_stepToPlace]];
 			}
 			else
-				self.patSetSeq_stepToPlace = index;
-			self.patSetSeqViewPlaceMode = !self.patSetSeqViewPlaceMode;
+				_patSetSeq_stepToPlace = index;
+			_patSetSeqViewPlaceMode = !_patSetSeqViewPlaceMode;
 			
 			updateLights = YES;
 		}
@@ -303,46 +283,38 @@ static PSSequencer *sharedSequencer = nil;
 	{
 		uint8_t button_code = event.affected_entity_code;
 		
-		if(button_code == kSettingBtn_code)
-		{
+		if(button_code == kSettingBtn_code) {
 			[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
-			shiftButtonHeld = YES;
+			_shiftButtonHeld = YES;
 			[self updateLights];
 		}
 		
-		if(!isModal && !shiftButtonHeld)
-		{
+		if(!_isModal && !_shiftButtonHeld) {
 			// Light the button
 			[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
 			
 			// Buttons in order of appearance on controller
-			if(button_code == kSceneBtn_code)
-			{
+			if(button_code == kSceneBtn_code) {
 				[self selectView:PSSequencerPatternSelectView];
-				self.isModal = YES;
+				_isModal = YES;
 			}
-			else if(button_code == kMessageBtn_code)
-			{
+			else if(button_code == kMessageBtn_code) {
 				[self selectView:PSSequencerPatternSetSelectView];
-				self.isModal = YES;
+				_isModal = YES;
 			}
-			else if(button_code == kHoldBtn_code)
-			{
+			else if(button_code == kHoldBtn_code) {
 				[self selectView:PSSequencerPatternSetSequencerView];
-				self.isModal = YES;
+				_isModal = YES;
 			}
-			else if(button_code == kFlamBtn_code)
-			{
+			else if(button_code == kFlamBtn_code) {
 				[self selectView:PSSequencerStepMuteView];
-				self.isModal = YES;
+				_isModal = YES;
 			}
-			else if(button_code == kRollBtn_code)
-			{
+			else if(button_code == kRollBtn_code) {
 				[self selectView:PSSequencerPatternCopyView];
-				self.isModal = YES;
+				_isModal = YES;
 			}
-			else
-			{
+			else {
 				// Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
 				uint8_t buttonCh = 5;
 				if(button_code == kXBtn_code)
@@ -371,71 +343,60 @@ static PSSequencer *sharedSequencer = nil;
 		}
 		// Shift mode (less often used functions)
 		// In shift mode we only light the button if it has a function
-		else if(shiftButtonHeld)
-		{
-			if(button_code == kNoteCCBtn_code)
-			{
-				self.inNoteChangeMode = YES;
+		else if(_shiftButtonHeld) {
+			if(button_code == kNoteCCBtn_code) {
+				_inNoteChangeMode = YES;
 				[self displayCurrentNoteOnLED];
 
 				[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
 			}
-			else if(button_code == kMidiCHBtn_code)
-			{
-				self.inChannelChangeMode = YES;
+			else if(button_code == kMidiCHBtn_code) {
+				_inChannelChangeMode = YES;
 				[self displayCurrentChannelOnLED];
 
 				[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
 			}
 		}
 	}
-	else if([event type] == PSPadKontrolButtonReleaseEventType)
-	{
+	else if([event type] == PSPadKontrolButtonReleaseEventType) {
 		uint8_t button_code = event.affected_entity_code;
 		
 		// Turn the button back off
 		[[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOff_code];
 		
-		if(button_code == kSettingBtn_code)
-		{
-			self.shiftButtonHeld = NO;
+		if(button_code == kSettingBtn_code) {
+			_shiftButtonHeld = NO;
 			[self updateLights];
 		}
 		// Return to sequencer mode
-		else if((button_code == kSceneBtn_code  && activeView == PSSequencerPatternSelectView)
-			 ||  (button_code == kFlamBtn_code    && activeView == PSSequencerStepMuteView)
-			 ||  (button_code == kMessageBtn_code && activeView == PSSequencerPatternSetSelectView)
-			 ||  (button_code == kRollBtn_code    && activeView == PSSequencerPatternCopyView)
-			 ||  (button_code == kHoldBtn_code    && activeView == PSSequencerPatternSetSequencerView))
-		{
+		else if((button_code == kSceneBtn_code  && _activeView == PSSequencerPatternSelectView)
+			 ||  (button_code == kFlamBtn_code    && _activeView == PSSequencerStepMuteView)
+			 ||  (button_code == kMessageBtn_code && _activeView == PSSequencerPatternSetSelectView)
+			 ||  (button_code == kRollBtn_code    && _activeView == PSSequencerPatternCopyView)
+			 ||  (button_code == kHoldBtn_code    && _activeView == PSSequencerPatternSetSequencerView)) {
 			[self selectView:PSSequencerSequencerView];
-			self.isModal = NO;
-			performingCopy = NO;
+			_isModal = NO;
+			_performingCopy = NO;
 		}
-		else if(button_code == kNoteCCBtn_code)
-		{
-			self.inNoteChangeMode = NO;
+		else if(button_code == kNoteCCBtn_code) {
+			_inNoteChangeMode = NO;
 			[[PSPadKontrol sharedPadKontrol] clearLED];
 		}
-		else if(button_code == kMidiCHBtn_code)
-		{
-			self.inChannelChangeMode = NO;
+		else if(button_code == kMidiCHBtn_code) {
+			_inChannelChangeMode = NO;
 			[[PSPadKontrol sharedPadKontrol] clearLED];
 		}
-		else if(button_code == kFixedVelBtn_code)
-		{
-			self.velocityEnabled = !velocityEnabled;
+		else if(button_code == kFixedVelBtn_code) {
+			_velocityEnabled = !_velocityEnabled;
 			[self updateLights];
 		}
-		else if(button_code == kProgChangeBtn_code)
-		{
+		else if(button_code == kProgChangeBtn_code) {
 			// Toggle pattern sequencing mode
-			inPatternSetSequencingMode = !inPatternSetSequencingMode;
-			currentPatSetSeqStep = 0;
+			_inPatternSetSequencingMode = !_inPatternSetSequencingMode;
+			_currentPatSetSeqStep = 0;
 			[self updateLights];
 		}
-		else
-		{
+		else {
 			// Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
 			uint8_t buttonCh = 5;
 			if(button_code == kXBtn_code)
@@ -462,82 +423,72 @@ static PSSequencer *sharedSequencer = nil;
 				[self transmitCC:26 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
 		}
 	}
-	else if([event type] == PSPadKontrolEncoderTurnEventType)
-	{
+	else if([event type] == PSPadKontrolEncoderTurnEventType) {
 		uint8_t direction = *event.values;
-		if(inNoteChangeMode)
-		{
-			if((direction == kEncoderDirectionLeft) && (activePatternSet.activePattern.note > 1))
-				self.activePatternSet.activePattern.note -= 1;
-			else if((direction == kEncoderDirectionRight) && (activePatternSet.activePattern.note < 127))
-				self.activePatternSet.activePattern.note += 1;
+		if(_inNoteChangeMode) {
+			if((direction == kEncoderDirectionLeft) && (_activePatternSet.activePattern.note > 1))
+				_activePatternSet.activePattern.note -= 1;
+			else if((direction == kEncoderDirectionRight) && (_activePatternSet.activePattern.note < 127))
+				_activePatternSet.activePattern.note += 1;
 			[self displayCurrentNoteOnLED];
 		}
-		else if(inChannelChangeMode)
-		{
-			if((direction == kEncoderDirectionLeft) && (activePatternSet.activePattern.channel > 1))
-				self.activePatternSet.activePattern.channel -= 1;
-			else if((direction == kEncoderDirectionRight) && (activePatternSet.activePattern.channel < 127))
-				self.activePatternSet.activePattern.channel += 1;
+		else if(_inChannelChangeMode) {
+			if((direction == kEncoderDirectionLeft) && (_activePatternSet.activePattern.channel > 1))
+				_activePatternSet.activePattern.channel -= 1;
+			else if((direction == kEncoderDirectionRight) && (_activePatternSet.activePattern.channel < 127))
+				_activePatternSet.activePattern.channel += 1;
 			[self displayCurrentChannelOnLED];
 		}
-		else
-		{
+		else {
 			if(direction == kEncoderDirectionLeft)
 				[self transmitCC:32 channel:5 value:127];		
 			else if(direction == kEncoderDirectionRight)
 				[self transmitCC:33 channel:5 value:127];		
 		}
 	}
-	else if([event type] == PSPadKontrolKnobTurnEventType)
-	{
+	else if([event type] == PSPadKontrolKnobTurnEventType) {
 		uint8_t ccCode;
 		if(event.affected_entity_code == kKnobOne_code)
 			ccCode = 27;
 		else if(event.affected_entity_code == kKnobTwo_code)
 			ccCode = 28;
+    else
+      return; // Should not happen
 		[self transmitCC:ccCode channel:5 value:*event.values];
 	}
 	else if([event type] == PSPadKontrolXYPadPressEventType)
 		[self transmitCC:29 channel:5 value:127];
 	else if([event type] == PSPadKontrolXYPadReleaseEventType)
 		[self transmitCC:29 channel:5 value:0];
-	else if([event type] == PSPadKontrolXYPadMoveEventType)
-	{
+	else if([event type] == PSPadKontrolXYPadMoveEventType) {
 		[self transmitCC:30 channel:5 value:*event.values];
 		[self transmitCC:31 channel:5 value:*(event.values+1)];
 	}
 }
 
-- (void)displayCurrentNoteOnLED
-{
-	[[PSPadKontrol sharedPadKontrol] setLEDNumber:(NSInteger)activePatternSet.activePattern.note blink:NO];
+- (void)displayCurrentNoteOnLED {
+	[[PSPadKontrol sharedPadKontrol] setLEDNumber:(NSInteger)_activePatternSet.activePattern.note blink:NO];
 }
-- (void)displayCurrentChannelOnLED
-{
-	[[PSPadKontrol sharedPadKontrol] setLEDNumber:(NSInteger)activePatternSet.activePattern.channel blink:NO];
+- (void)displayCurrentChannelOnLED {
+	[[PSPadKontrol sharedPadKontrol] setLEDNumber:(NSInteger)_activePatternSet.activePattern.channel blink:NO];
 }
 
 // Updates the lights on the controller
 // For information on the multipleLight thing, read PadKontrolConstants
-- (void)updateLights
-{
-	PSPattern *activePattern = [activePatternSet activePattern];
+- (void)updateLights {
+	PSPattern *activePattern = [_activePatternSet activePattern];
 	uint8_t groupOne   = 0x00;
 	uint8_t groupTwo   = 0x00;
 	uint8_t groupThree = 0x00;
 	uint8_t groupFour  = 0x00;
 	uint8_t groupFive  = 0x00;
 	
-	if(self.activeView == PSSequencerSequencerView)
-	{
+	if(_activeView == PSSequencerSequencerView) {
 		PSStep *currStep;
 		// Light the pads corresponding to active steps
-		for(int i = 0; i < 16; ++i)
-		{
+		for(int i = 0; i < 16; ++i) {
 			currStep = [[activePattern steps] objectAtIndex:i];
-			if(currStep.enabled)
-			{
+			if(currStep.enabled) {
 				if(i < 7)
 					groupOne = groupOne | kMultipleLightGroup[i];
 				else if(i < 14)
@@ -547,13 +498,12 @@ static PSSequencer *sharedSequencer = nil;
 			}
 		}
 	}
-	else if(self.activeView == PSSequencerPatternSelectView)
-	{
+	else if(_activeView == PSSequencerPatternSelectView) {
 		// Light the activator button
 		groupThree |= kMultipleLightGroup[2];
 		
 		// Highlight the pad corresponding the active pattern
-		NSUInteger selectedIndex = [activePatternSet.patterns indexOfObject:activePattern];
+		NSUInteger selectedIndex = [_activePatternSet.patterns indexOfObject:activePattern];
 		if(selectedIndex < 7)
 			groupOne |= kMultipleLightGroup[selectedIndex];
 		else if(selectedIndex < 14)
@@ -561,12 +511,11 @@ static PSSequencer *sharedSequencer = nil;
 		else if(selectedIndex < 16)
 			groupThree |= kMultipleLightGroup[selectedIndex - 14];
 	}
-	else if(self.activeView == PSSequencerStepMuteView)
-	{
+	else if(_activeView == PSSequencerStepMuteView) {
 		// Light the activator button
 		groupFive |= kMultipleLightGroup[5];
 		
-		NSMutableIndexSet *mutedSteps = activePatternSet.mutedSteps;
+		NSMutableIndexSet *mutedSteps = _activePatternSet.mutedSteps;
 		NSUInteger index = [mutedSteps firstIndex];
 		while(index != NSNotFound)
 		{
@@ -580,11 +529,10 @@ static PSSequencer *sharedSequencer = nil;
 			index = [mutedSteps indexGreaterThanIndex:index];
 		}
 	}
-	else if(self.activeView == PSSequencerPatternSetSelectView)
-	{
+	else if(_activeView == PSSequencerPatternSetSelectView) {
 		groupThree |= kMultipleLightGroup[3];
 		// Highlight the pad corresponding the active pattern set
-		NSUInteger selectedIndex = [self.patternSets indexOfObject:activePatternSet];
+		NSUInteger selectedIndex = [_patternSets indexOfObject:_activePatternSet];
 		if(selectedIndex < 7)
 			groupOne |= kMultipleLightGroup[selectedIndex];
 		else if(selectedIndex < 14)
@@ -593,21 +541,19 @@ static PSSequencer *sharedSequencer = nil;
 			groupThree |= kMultipleLightGroup[selectedIndex - 14];
 		
 	}
-	else if(self.activeView == PSSequencerPatternCopyView)
-	{
+	else if(_activeView == PSSequencerPatternCopyView) {
 		groupFive |= kMultipleLightGroup[4];
 		
 		groupOne = 0x7f;
 		groupTwo = 0x7f;
 		groupThree |= kMultipleLightGroup[0]| kMultipleLightGroup[1];
 	}
-	else if(self.activeView == PSSequencerPatternSetSequencerView)
-	{
+	else if(_activeView == PSSequencerPatternSetSequencerView) {
 		NSUInteger stepsToLight = 16;
-		if(self.shiftButtonHeld) // delete view
-			stepsToLight = [self.patternSetSequencerSteps count];
-		else if(self.patSetSeqViewPlaceMode)
-			stepsToLight = [self.patternSetSequencerSteps count] + 1;
+		if(_shiftButtonHeld) // delete view
+			stepsToLight = [_patternSetSequencerSteps count];
+		else if(_patSetSeqViewPlaceMode)
+			stepsToLight = [_patternSetSequencerSteps count] + 1;
 		for(int i = 0; i < stepsToLight; ++i)
 		{
 			if(i < 7)
@@ -620,9 +566,9 @@ static PSSequencer *sharedSequencer = nil;
 	}
 	
 	// Make sure toggle buttons are correctly lit
-	if(!self.velocityEnabled)
+	if(!_velocityEnabled)
 		groupFour |= kMultipleLightGroup[4];
-	if(self.inPatternSetSequencingMode)
+	if(_inPatternSetSequencingMode)
 		groupFour |= kMultipleLightGroup[5];
 	
 	// Create the mask and turn on the lights
@@ -636,46 +582,33 @@ static PSSequencer *sharedSequencer = nil;
 	free(mask);
 	
 	// If necessary, flash the currently playing pattern set in the pattern set sequencer
-	if(self.activeView == PSSequencerPatternSetSequencerView && inPatternSetSequencingMode)
-	{
-		uint8_t lightCode = kPadOn_codes[currentPatSetSeqStep];
+	if(_activeView == PSSequencerPatternSetSequencerView && _inPatternSetSequencingMode) {
+		uint8_t lightCode = kPadOn_codes[_currentPatSetSeqStep];
 		uint8_t lightState = kPad_blink_code;
 		[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode state:&lightState];
 	}
 }
 #pragma mark -
 // MIDI interface
-- (void)takeMIDIMessages:(NSArray *)messages
-{
+- (void)takeMIDIMessages:(NSArray *)messages {
 	// We don't really receive anything except SysEx's
 }
-- (void)transmitCC:(uint8_t)ccNumber channel:(uint8_t)channel value:(uint8_t)value
-{
+- (void)transmitCC:(uint8_t)ccNumber channel:(uint8_t)channel value:(uint8_t)value {
 	uint8_t data[2] = { ccNumber, value };
 	SMVoiceMessage *message = [SMVoiceMessage voiceMessageWithTimeStamp:SMGetCurrentHostTime()
 																													 statusByte:SMVoiceMessageStatusControl
 																																 data:data
 																															 length:sizeof(uint8_t)*2];
 	[message setChannel:channel];
-	[virtualOutputStream takeMIDIMessages:[NSArray arrayWithObject:message]];
+	[_virtualOutputStream takeMIDIMessages:[NSArray arrayWithObject:message]];
 }
 #pragma mark -
-- (void)clockPulseHappened:(PSClock *)clock
-{
+- (void)clockPulseHappened:(PSClock *)clock {
 	[self performStep];
 }
-- (void)clockDidStop:(PSClock *)clock
-{
+- (void)clockDidStop:(PSClock *)clock {
 	[self resetSequencer];
 }
-- (void)clockDidStart:(PSClock *)clock
-{
-}
-
-- (void)dealloc
-{
-	[midiMessagesAlive release];
-	
-	[super dealloc];
+- (void)clockDidStart:(PSClock *)clock {
 }
 @end

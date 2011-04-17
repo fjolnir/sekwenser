@@ -44,25 +44,25 @@
 
 @interface PSClock : NSObject {
 	// CoreAudio clock
-	CAClockRef caClock;
+	CAClockRef _caClock;
 	
-	MIDIClientRef clientRef;
-	MIDIPortRef inputPortRef;
-	MIDIEndpointRef srcPointRef;
-	CAClockSeconds keepSeconds;
+	MIDIClientRef _clientRef;
+	MIDIPortRef _inputPortRef;
+	MIDIEndpointRef _srcPointRef;
+	CAClockSeconds _keepSeconds;
 	
 	// the internal bpm, only accurate if internal syncing is used
 	// Otherwise it has to be multiplied by the playrate (handled by -currentBPM)
-	CAClockTempo internalBPM;
+	CAClockTempo _internalBPM;
 	
 	// The interval between clock pulses. Specified in beats (Default: 0.25 => 4 times per beat)
-	CAClockBeats pulseInterval;
+	CAClockBeats _pulseInterval;
 	
-	void (^beatCheckBlock)(void);
+	void (^_beatCheckBlock)(void);
 		
-	BOOL running;
+	BOOL _running;
 	
-	NSMutableArray *listeners;
+	NSMutableArray *_listeners;
 }
 @property(readwrite, assign) CAClockBeats pulseInterval;
 @property(readwrite, retain) NSMutableArray *listeners;

@@ -54,12 +54,12 @@ typedef uint8_t PSPadKontrolValue;
 
 @interface PSPadKontrol : NSObject <SMMessageDestination> {
 	// MIDI interface
-	SSECombinationOutputStream *outputStream;
-	SMPortInputStream *inputStream;
+	SSECombinationOutputStream *_outputStream;
+	SMPortInputStream *_inputStream;
 	
-	NSMutableArray *eventListeners;
+	NSMutableArray *_eventListeners;
 	
-	uint8_t *ledValue;
+	uint8_t *_ledValue;
 }
 @property(readwrite, retain) SSECombinationOutputStream *outputStream;
 @property(readwrite, retain) SMPortInputStream *inputStream;

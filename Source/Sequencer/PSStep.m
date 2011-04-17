@@ -36,36 +36,33 @@
 
 
 @implementation PSStep
-@synthesize enabled, velocity;
+@synthesize enabled=_enabled, velocity=_velocity;
 
-+ (PSStep *)stepWithVelocity:(uint8_t)inVelocity
-{
++ (PSStep *)stepWithVelocity:(uint8_t)inVelocity {
 	PSStep *ret = [[self alloc] init];
 	ret.velocity = inVelocity;
 	
 	return [ret autorelease];
 }
 
-- (id)copyWithZone:(NSZone *)zone
-{
-	PSStep *copy = [[PSStep stepWithVelocity:self.velocity] retain];
-	copy.enabled = self.enabled;
+- (id)copyWithZone:(NSZone *)zone {
+	PSStep *copy = [[PSStep stepWithVelocity:_velocity] retain];
+	copy.enabled = _enabled;
+  
 	return copy;
 }
 
-- (id)initWithCoder:(NSCoder *)coder
-{
+- (id)initWithCoder:(NSCoder *)coder {
 	if(!(self = [super init]))
 		return nil;
 	
-	self.enabled = [coder decodeBoolForKey:@"stepEnabled"];
-	self.velocity = [coder decodeIntForKey:@"stepVelocity"];
+	_enabled = [coder decodeBoolForKey:@"stepEnabled"];
+	_velocity = [coder decodeIntForKey:@"stepVelocity"];
 	
 	return self;
 }
-- (void)encodeWithCoder:(NSCoder *)coder
-{
-	[coder encodeBool:self.enabled forKey:@"stepEnabled"];
-	[coder encodeInt:self.velocity forKey:@"stepVelocity"];
+- (void)encodeWithCoder:(NSCoder *)coder {
+	[coder encodeBool:_enabled forKey:@"stepEnabled"];
+	[coder encodeInt:_velocity forKey:@"stepVelocity"];
 }
 @end

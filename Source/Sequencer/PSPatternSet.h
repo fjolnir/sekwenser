@@ -39,10 +39,10 @@
 @class PSPattern;
 
 @interface PSPatternSet : NSObject<NSCoding, NSCopying> {
-	NSMutableArray *patterns;
-	PSPattern *activePattern;
+	NSMutableArray *_patterns;
+	PSPattern *_activePattern;
 	
-	NSMutableIndexSet *mutedSteps;
+	NSMutableIndexSet *_mutedSteps;
 }
 @property(readwrite, retain) NSMutableArray *patterns;
 @property(readwrite, retain) PSPattern *activePattern;
