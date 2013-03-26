@@ -123,6 +123,8 @@
 }
 
 - (IBAction)loadSelected:(id)sender {
+    if([_layoutListTable selectedRow] == -1)
+        return;
 	NSString *path = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[_savedLayouts objectAtIndex:[_layoutListTable selectedRow]]];
 	[self performLoad:path];
 }
@@ -169,11 +171,13 @@
 	NSUInteger fileNumber = [[[NSFileManager defaultManager] contentsOfDirectoryAtPath:LAYOUT_DIR_PATH error:nil] count] + 1;
 	NSString *destPath = [LAYOUT_DIR_PATH stringByAppendingPathComponent:[NSString stringWithFormat:@"Layout %d.seklayout", fileNumber]];
 	[self saveToPath:destPath];
-	
+
 	[self updateLayoutList];
 }
 
 - (IBAction)performDelete:(id)sender {
+    if([_layoutListTable selectedRow] == -1)
+        return;
 	NSString *trashDir = [NSHomeDirectory() stringByAppendingPathComponent:@".Trash"];
 	
 	[[NSWorkspace sharedWorkspace] performFileOperation:NSWorkspaceRecycleOperation
