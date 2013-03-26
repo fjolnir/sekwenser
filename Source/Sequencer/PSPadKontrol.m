@@ -145,6 +145,12 @@ PSPadKontrol *sharedPadKontrol;
 	[self sendSysexCommand:kExitNative size:sizeof(kExitNative)];
 }
 
+- (void)resetAllLights {
+    [self clearLED];
+	uint8_t mask[5] = {0};
+    [self controlMultipleLights:mask ledMask:mask];
+}
+
 - (void)controlLight:(uint8_t *)lightIdentifier state:(uint8_t *)lightState {
 	uint8_t *lightCommand = alloca(sizeof(kPad_lightCommandTemplate_code));
 	memcpy(lightCommand, kPad_lightCommandTemplate_code, sizeof(kPad_lightCommandTemplate_code));
@@ -228,14 +234,14 @@ PSPadKontrol *sharedPadKontrol;
 		snprintf(numStr, sizeof(uint8_t)*4, "err");
 	}
 
-	[[PSPadKontrol sharedPadKontrol] setLEDString:(uint8_t *)numStr blink:blink];
+	[[PSPadKontrol sharedPadKontrol] setLEDString:numStr blink:blink];
 	free(numStr);
 }
 
 - (void)clearLED {
 	uint8_t clearBytes[3] = {0x29, 0x29, 0x29};
 	memcpy(_ledValue, &clearBytes, sizeof(uint8_t)*3);
-	[[PSPadKontrol sharedPadKontrol] setLEDString:clearBytes blink:NO];
+	[[PSPadKontrol sharedPadKontrol] setLEDString:(char*)clearBytes blink:NO];
 }
 
 - (BOOL)padIdentifierIsForOnState:(uint8_t *)identifier {
@@ -356,7 +362,8 @@ PSPadKontrol *sharedPadKontrol;
 
 - (void)_transmitEvent:(PSPadKontrolEvent *)anEvent {
 	for(id<PSPadKontrolEventListener> listener in self.eventListeners) {
-		[listener padKontrolEventReceived:anEvent fromPadKontrol:self];
+		if(![listener padKontrolEventReceived:anEvent fromPadKontrol:self])
+            return;
 	}
 }
 //

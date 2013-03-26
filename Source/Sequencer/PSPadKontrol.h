@@ -78,16 +78,18 @@ typedef uint8_t PSPadKontrolValue;
 // Convenience function to build a mask for multiple light control
 // You need to free the returned mask yourself
 - (uint8_t *)buildMultipleLightControlMaskFromGroupOne:(uint8_t *)maskOne 
-																									 two:(uint8_t *)maskTwo 
-																								 three:(uint8_t *)maskThree
-																									four:(uint8_t *)maskFour
-																									five:(uint8_t *)maskFive;
+                                                   two:(uint8_t *)maskTwo
+                                                 three:(uint8_t *)maskThree
+                                                  four:(uint8_t *)maskFour
+                                                  five:(uint8_t *)maskFive;
 - (void)setLEDString:(const char *)string blink:(BOOL)blink;
 - (void)setLEDNumber:(NSInteger)number blink:(BOOL)blink;
 - (void)clearLED;
 
 - (void)enterNativeMode;
 - (void)exitNativeMode;
+
+- (void)resetAllLights;
 
 // MIDI
 - (void)sendSysexCommand:(const uint8_t *)command size:(NSUInteger)commandSize;
