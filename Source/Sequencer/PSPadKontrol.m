@@ -146,20 +146,18 @@ PSPadKontrol *sharedPadKontrol;
 }
 
 - (void)controlLight:(uint8_t *)lightIdentifier state:(uint8_t *)lightState {
-	uint8_t *lightCommand = malloc(sizeof(kPad_lightCommandTemplate_code));
+	uint8_t *lightCommand = alloca(sizeof(kPad_lightCommandTemplate_code));
 	memcpy(lightCommand, kPad_lightCommandTemplate_code, sizeof(kPad_lightCommandTemplate_code));
 	memcpy(lightCommand+6, lightIdentifier, 1);
 	memcpy(lightCommand+7, lightState, 1);
 	
 	[self sendSysexCommand:lightCommand size:sizeof(kPad_lightCommandTemplate_code)];
-	
-	free(lightCommand);
 }
 
 // Button mask is 5 bytes, led mask is 3 bytes
 - (void)controlMultipleLights:(uint8_t *)buttonMask ledMask:(uint8_t *)ledMask {
 	// the mask is 5 bytes
-	uint8_t *command = malloc(sizeof(kMultipleLightCommandTemplate_code));
+	uint8_t *command = alloca(sizeof(kMultipleLightCommandTemplate_code));
 	memcpy(command, kMultipleLightCommandTemplate_code, sizeof(kMultipleLightCommandTemplate_code));
 	if(buttonMask)
 		memcpy(command+8, buttonMask, sizeof(uint8_t)*5);
@@ -179,7 +177,6 @@ PSPadKontrol *sharedPadKontrol;
 
 	//NSLog(@"multicmd %@", [NSData dataWithBytes:command length:sizeof(kMultipleLightCommandTemplate_code)]);
 	[self sendSysexCommand:command size:sizeof(kMultipleLightCommandTemplate_code)];
-	free(command);
 }
 // Convenience function to build a mask for multiple light control
 - (uint8_t *)buildMultipleLightControlMaskFromGroupOne:(uint8_t *)maskOne 
@@ -203,22 +200,22 @@ PSPadKontrol *sharedPadKontrol;
 	
 	return mask;
 }
-- (void)setLEDString:(uint8_t *)string blink:(BOOL)blink {
+- (void)setLEDString:(const char *)string blink:(BOOL)blink {
+    char *buf = strndup(string, 4);
 	for(int i = 0; i < 3; ++i) {
-		if(*(string + i) == 0x00)
-			*(string + i) = 0x29;
+		if(*(buf + i) == 0x00)
+			*(buf + i) = 0x29;
 	}
-	uint8_t *command = malloc(sizeof(kLEDReadoutCommandTemplate_code));
+	uint8_t *command = alloca(sizeof(kLEDReadoutCommandTemplate_code));
 	memcpy(command, kLEDReadoutCommandTemplate_code, sizeof(kLEDReadoutCommandTemplate_code));
 	uint8_t status = kLEDStateOn_code;
 	if(blink)
 		status = kLEDStateBlink_code;
 	memcpy(command+7, &status, sizeof(uint8_t));
-	memcpy(command+8, string, sizeof(uint8_t)*3);
+	memcpy(command+8, buf, sizeof(uint8_t)*3);
 	
-	memcpy(_ledValue, string, sizeof(uint8_t)*3);
+	memcpy(_ledValue, buf, sizeof(uint8_t)*3);
 	[self sendSysexCommand:command size:sizeof(kLEDReadoutCommandTemplate_code)];
-	free(command);
 }
 - (void)setLEDNumber:(NSInteger)number blink:(BOOL)blink {
 	char *numStr = malloc(sizeof(char)*4);
@@ -287,7 +284,7 @@ PSPadKontrol *sharedPadKontrol;
 		}
 	}
 	else if(command == kButtonPushCommand_code) {
-		uint8_t *buttonInfo = malloc(sizeof(uint8_t)*2);
+        uint8_t buttonInfo[2];
 		[data getBytes:buttonInfo range:NSMakeRange(commandLoc+1, 2)];
 		
 		affected_entity_code = *buttonInfo;
@@ -307,7 +304,7 @@ PSPadKontrol *sharedPadKontrol;
 
 	}
 	else if(command == kKnobTurnCommand_code) {
-		uint8_t *knobInfo = malloc(sizeof(uint8_t)*2);
+		uint8_t knobInfo[2];
 		[data getBytes:knobInfo range:NSMakeRange(commandLoc+1, 2)];
 		
 		affected_entity_code = *knobInfo;
@@ -318,10 +315,10 @@ PSPadKontrol *sharedPadKontrol;
 		memcpy(eventValues, (knobInfo+1), sizeof(PSPadKontrolValue));
 	}
 	else if(command == kEncoderTurnCommand_code) {
-		uint8_t *encoderInfo = malloc(sizeof(uint8_t)*2);
+		uint8_t encoderInfo[2];
 		[data getBytes:encoderInfo range:NSMakeRange(commandLoc+1, 2)];
 		
-		affected_entity_code = *encoderInfo;
+		affected_entity_code = encoderInfo[0];
 		//NSLog(@"Encoder turn %d", *(encoderInfo+1));
 		eventType = PSPadKontrolEncoderTurnEventType;
 		numberOfEventValues = 1;
@@ -329,7 +326,7 @@ PSPadKontrol *sharedPadKontrol;
 		memcpy(eventValues, (encoderInfo+1), sizeof(PSPadKontrolValue));
 	}
 	else if(command == kXYPadMove) {
-		uint8_t *xyPadInfo = malloc(sizeof(uint8_t)*2);
+		uint8_t *xyPadInfo[2];
 		[data getBytes:xyPadInfo range:NSMakeRange(commandLoc+1, 2)];
 		
 		//NSLog(@"XY Pad moved %d %d", *xyPadInfo, *(xyPadInfo+1));
@@ -365,11 +362,11 @@ PSPadKontrol *sharedPadKontrol;
 //
 // MIDI interface
 - (void)sendSysexCommand:(const uint8_t *)command size:(NSUInteger)commandSize {
-	uint8_t *message = malloc(commandSize);
-	memcpy(message, command, commandSize);
-	
+//	uint8_t *message = malloc(commandSize);
+//	memcpy(message, command, commandSize);
+
 	//NSLog(@"init message frag %x %x %x %x %x %x %x %x %x %x %x %x %x", *message, *(message+1), *(message+2), *(message+3), *(message+4), *(message+5), *(message+6), *(message+7), *(message+8), *(message+9), *(message+10), *(message+11), *(message+12));
-	NSData *data = [NSData dataWithBytes:message length:commandSize];
+	NSData *data = [NSData dataWithBytes:command length:commandSize];
 	//NSLog(@"nsdata %@ size %d", [data description], commandSize);
 	
 	NSArray *messages = [SMSystemExclusiveMessage systemExclusiveMessagesInData:data];

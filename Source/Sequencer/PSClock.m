@@ -374,7 +374,7 @@ static void clockListener(void *userData, CAClockMessage message, const void *pa
 	return UINT_MAX;  // Cannot be released
 }
 
-- (void)release {
+- (oneway void)release {
 	// Do nothing
 }
 

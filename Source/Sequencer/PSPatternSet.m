@@ -88,7 +88,7 @@
 	PSPatternSet *copy = [[PSPatternSet alloc] init];
 	copy.patterns = [[[NSMutableArray alloc] initWithArray:_patterns copyItems:YES] autorelease];
 	copy.activePattern = [copy.patterns objectAtIndex:[_patterns indexOfObject:_activePattern]];
-	copy.mutedSteps = [_mutedSteps mutableCopyWithZone:zone];
+	copy.mutedSteps = [[_mutedSteps mutableCopyWithZone:zone] autorelease];
 	
 	return copy;
 }

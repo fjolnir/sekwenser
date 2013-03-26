@@ -82,7 +82,7 @@ typedef uint8_t PSPadKontrolValue;
 																								 three:(uint8_t *)maskThree
 																									four:(uint8_t *)maskFour
 																									five:(uint8_t *)maskFive;
-- (void)setLEDString:(uint8_t *)string blink:(BOOL)blink;
+- (void)setLEDString:(const char *)string blink:(BOOL)blink;
 - (void)setLEDNumber:(NSInteger)number blink:(BOOL)blink;
 - (void)clearLED;
 
