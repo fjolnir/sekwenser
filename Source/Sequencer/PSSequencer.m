@@ -188,6 +188,7 @@ static PSSequencer *sharedSequencer = nil;
 - (void)selectView:(PSSequencerView)view {
 	if(_activeView == PSSequencerSequencerView || view == PSSequencerSequencerView) {
 		_activeView = view;
+        [[PSPadKontrol sharedPadKontrol] setLEDString:"   " blink:NO];
 		[self updateLights];
 	}
 }
@@ -499,6 +500,7 @@ static PSSequencer *sharedSequencer = nil;
 		}
 	}
 	else if(_activeView == PSSequencerPatternSelectView) {
+        [[PSPadKontrol sharedPadKontrol] setLEDString:"INS" blink:YES];
 		// Light the activator button
 		groupThree |= kMultipleLightGroup[2];
 		
@@ -512,6 +514,7 @@ static PSSequencer *sharedSequencer = nil;
 			groupThree |= kMultipleLightGroup[selectedIndex - 14];
 	}
 	else if(_activeView == PSSequencerStepMuteView) {
+        [[PSPadKontrol sharedPadKontrol] setLEDString:"TGL" blink:NO];
 		// Light the activator button
 		groupFive |= kMultipleLightGroup[5];
 		
@@ -530,6 +533,7 @@ static PSSequencer *sharedSequencer = nil;
 		}
 	}
 	else if(_activeView == PSSequencerPatternSetSelectView) {
+        [[PSPadKontrol sharedPadKontrol] setLEDString:"BNK" blink:YES];
 		groupThree |= kMultipleLightGroup[3];
 		// Highlight the pad corresponding the active pattern set
 		NSUInteger selectedIndex = [_patternSets indexOfObject:_activePatternSet];
@@ -542,6 +546,7 @@ static PSSequencer *sharedSequencer = nil;
 		
 	}
 	else if(_activeView == PSSequencerPatternCopyView) {
+        [[PSPadKontrol sharedPadKontrol] setLEDString:"CPY" blink:YES];
 		groupFive |= kMultipleLightGroup[4];
 		
 		groupOne = 0x7f;
@@ -549,6 +554,7 @@ static PSSequencer *sharedSequencer = nil;
 		groupThree |= kMultipleLightGroup[0]| kMultipleLightGroup[1];
 	}
 	else if(_activeView == PSSequencerPatternSetSequencerView) {
+        [[PSPadKontrol sharedPadKontrol] setLEDString:"PSE" blink:YES];
 		NSUInteger stepsToLight = 16;
 		if(_shiftButtonHeld) // delete view
 			stepsToLight = [_patternSetSequencerSteps count];
