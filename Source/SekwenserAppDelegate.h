@@ -33,17 +33,19 @@
 
 
 #import <Cocoa/Cocoa.h>
+#import "PSPadKontrolEventListener.h"
 
-@class PSPadKontrol;
+@class PSPadKontrol, PSSequencer;
 
-@interface SekwenserAppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource> {
+@interface SekwenserAppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, PSPadKontrolEventListener> {
 	NSWindow *_window;
 	
 	IBOutlet NSPopUpButton *_syncSourcePopupBtn;
 	
 	NSMutableArray *_savedLayouts;
 	IBOutlet NSTableView *_layoutListTable;
-	
+
+    PSSequencer *_sequencer;
 }
 
 @property(assign) IBOutlet NSWindow *window;

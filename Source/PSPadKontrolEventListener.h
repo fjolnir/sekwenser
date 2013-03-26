@@ -36,5 +36,5 @@
 @class PSPadKontrolEvent;
 
 @protocol PSPadKontrolEventListener
-- (void)padKontrolEventReceived:(PSPadKontrolEvent *)event fromPadKontrol:(PSPadKontrol *)padKontrol;
+- (BOOL)padKontrolEventReceived:(PSPadKontrolEvent *)event fromPadKontrol:(PSPadKontrol *)padKontrol;
 @end

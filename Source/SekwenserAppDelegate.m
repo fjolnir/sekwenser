@@ -37,6 +37,7 @@
 #import "SSECombinationOutputStream.h"
 #import "PadKontrolConstants.h"
 #import "PSClock.h"
+#import "PSPadKontrolEvent.h"
 
 #import "PSSequencer.h"
 #import "PSPadKontrol.h"
@@ -59,10 +60,12 @@
 	//[clock setSyncMode:kCAClockSyncMode_Internal];
 	//[clock start];
 	[clock arm];
-	
+
+    [[[PSPadKontrol sharedPadKontrol] eventListeners] addObject:self];
 	// Initialize the sequencer
 	[[PSPadKontrol sharedPadKontrol] enterNativeMode];
-	[PSSequencer sharedSequencer];
+    _sequencer = [PSSequencer new];
+	[_sequencer makeKey];
 
 	[self updateLayoutList];
 	[self refreshMidiSources:nil];
@@ -79,6 +82,20 @@
   [_savedLayouts release];
   
   [super dealloc];
+}
+
+// Mode selektor
+- (BOOL)padKontrolEventReceived:(PSPadKontrolEvent *)event fromPadKontrol:(PSPadKontrol *)padKontrol {
+    if(event.type == PSPadKontrolButtonReleaseEventType && event.affected_entity_code == kSettingBtn_code) {
+        if([_sequencer isKey]) {
+            [_sequencer resignKey];
+            [[PSPadKontrol sharedPadKontrol] resetAllLights];
+        } else {
+            [_sequencer makeKey];
+        }
+        return NO;
+    }
+    return YES;
 }
 
 // Interface stuff
@@ -137,16 +154,16 @@
 	loadedSets = [loadedData objectForKey:@"patternSets"];
 	loadedPatternSeqSteps = [loadedData objectForKey:@"patternSetSequencerSteps"];
 	
-	[[PSSequencer sharedSequencer] resetSequencer];
-	[[PSSequencer sharedSequencer] setPatternSets:loadedSets];
-	[[PSSequencer sharedSequencer] setPatternSetSequencerSteps:loadedPatternSeqSteps];
-	[[PSSequencer sharedSequencer] setActivePatternSet:[loadedSets objectAtIndex:0]];
-	[[PSSequencer sharedSequencer] updateLights];
+	[_sequencer resetSequencer];
+	[_sequencer setPatternSets:loadedSets];
+	[_sequencer setPatternSetSequencerSteps:loadedPatternSeqSteps];
+	[_sequencer setActivePatternSet:[loadedSets objectAtIndex:0]];
+	[_sequencer updateLights];
 }
 - (void)saveToPath:(NSString *)path {
 	NSDictionary *forSaving = [NSDictionary dictionaryWithObjectsAndKeys:
-														 [[PSSequencer sharedSequencer] patternSets], @"patternSets",
-														 [PSSequencer sharedSequencer].patternSetSequencerSteps, @"patternSetSequencerSteps", nil];
+														 [_sequencer patternSets], @"patternSets",
+														 _sequencer.patternSetSequencerSteps, @"patternSetSequencerSteps", nil];
 	BOOL success = [NSKeyedArchiver archiveRootObject:forSaving
 																						 toFile:path];
 	if(!success)

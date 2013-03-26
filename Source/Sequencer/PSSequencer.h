@@ -36,6 +36,7 @@
 #import <SnoizeMIDI/SMMessageDestinationProtocol.h>
 #import "PSClockListener.h"
 #import "PSPadKontrolEventListener.h"
+#import "PSPadKontrolView.h"
 
 @class SSECombinationOutputStream;
 @class SMPortInputStream;
@@ -53,7 +54,7 @@ typedef enum
 	PSSequencerPatternSetSequencerView = 6
 } PSSequencerView;
 
-@interface PSSequencer : NSObject <SMMessageDestination, PSClockListener, PSPadKontrolEventListener> {	
+@interface PSSequencer : PSPadKontrolView <SMMessageDestination, PSClockListener, PSPadKontrolEventListener> {	
 	// The number of steps is not meant to be changed, I'm only keeping things dynamic so that if
 	// anyone wants to implement support for a different controller than the PadKONTROL
 	// it will be less of a hassle
@@ -128,8 +129,6 @@ typedef enum
 @property(readwrite, assign) NSUInteger currentPatSetSeqStep;
 @property(readwrite, assign) BOOL patSetSeqViewPlaceMode;
 @property(readwrite, assign) NSUInteger patSetSeq_stepToPlace;
-
-+ (PSSequencer *)sharedSequencer;
 
 - (void)updateLights;
 
