@@ -72,16 +72,16 @@ typedef uint8_t PSPadKontrolValue;
 - (void)registerEventListener:(id)listener;
 - (void)unregisterEventListener:(id)listener;
 
-- (void)controlLight:(uint8_t *)lightIdentifier state:(uint8_t *)lightState;
+- (void)controlLight:(const uint8_t *)lightIdentifier state:(const uint8_t *)lightState;
 // Button mask is 5 bytes, led mask is 3 bytes
-- (void)controlMultipleLights:(uint8_t *)buttonMask ledMask:(uint8_t *)ledMask;
+- (void)controlMultipleLights:(const uint8_t *)buttonMask ledMask:(const uint8_t *)ledMask;
 // Convenience function to build a mask for multiple light control
 // You need to free the returned mask yourself
-- (uint8_t *)buildMultipleLightControlMaskFromGroupOne:(uint8_t *)maskOne 
-                                                   two:(uint8_t *)maskTwo
-                                                 three:(uint8_t *)maskThree
-                                                  four:(uint8_t *)maskFour
-                                                  five:(uint8_t *)maskFive;
+- (uint8_t *)buildMultipleLightControlMaskFromGroupOne:(const uint8_t *)maskOne 
+                                                   two:(const uint8_t *)maskTwo
+                                                 three:(const uint8_t *)maskThree
+                                                  four:(const uint8_t *)maskFour
+                                                  five:(const uint8_t *)maskFive;
 - (void)setLEDString:(const char *)string blink:(BOOL)blink;
 - (void)setLEDNumber:(NSInteger)number blink:(BOOL)blink;
 - (void)clearLED;

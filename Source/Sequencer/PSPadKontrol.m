@@ -151,7 +151,7 @@ PSPadKontrol *sharedPadKontrol;
     [self controlMultipleLights:mask ledMask:mask];
 }
 
-- (void)controlLight:(uint8_t *)lightIdentifier state:(uint8_t *)lightState {
+- (void)controlLight:(const uint8_t *)lightIdentifier state:(const uint8_t *)lightState {
 	uint8_t *lightCommand = alloca(sizeof(kPad_lightCommandTemplate_code));
 	memcpy(lightCommand, kPad_lightCommandTemplate_code, sizeof(kPad_lightCommandTemplate_code));
 	memcpy(lightCommand+6, lightIdentifier, 1);
@@ -161,7 +161,7 @@ PSPadKontrol *sharedPadKontrol;
 }
 
 // Button mask is 5 bytes, led mask is 3 bytes
-- (void)controlMultipleLights:(uint8_t *)buttonMask ledMask:(uint8_t *)ledMask {
+- (void)controlMultipleLights:(const uint8_t *)buttonMask ledMask:(const uint8_t *)ledMask {
 	// the mask is 5 bytes
 	uint8_t *command = alloca(sizeof(kMultipleLightCommandTemplate_code));
 	memcpy(command, kMultipleLightCommandTemplate_code, sizeof(kMultipleLightCommandTemplate_code));
@@ -185,11 +185,11 @@ PSPadKontrol *sharedPadKontrol;
 	[self sendSysexCommand:command size:sizeof(kMultipleLightCommandTemplate_code)];
 }
 // Convenience function to build a mask for multiple light control
-- (uint8_t *)buildMultipleLightControlMaskFromGroupOne:(uint8_t *)maskOne 
-																									 two:(uint8_t *)maskTwo 
-																								 three:(uint8_t *)maskThree
-																									four:(uint8_t *)maskFour
-																									five:(uint8_t *)maskFive
+- (uint8_t *)buildMultipleLightControlMaskFromGroupOne:(const uint8_t *)maskOne 
+																									 two:(const uint8_t *)maskTwo 
+																								 three:(const uint8_t *)maskThree
+																									four:(const uint8_t *)maskFour
+																									five:(const uint8_t *)maskFive
 
 {
 	uint8_t *mask = calloc(5, sizeof(uint8_t)); // Use calloc to get a zeroed mask

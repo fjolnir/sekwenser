@@ -37,6 +37,7 @@
 #import "PSPatternSet.h"
 #import "PSPattern.h"
 #import "PSStep.h"
+#import "SekwenserAppDelegate.h"
 
 #import <SnoizeMIDI/SnoizeMIDI.h>
 #import "SSECombinationOutputStream.h"
@@ -58,7 +59,7 @@
 #pragma mark -
 
 @implementation PSSequencer
-@synthesize patternSets=_patternSets, numberOfSteps=_numberOfSteps, activePatternSet=_activePatternSet, virtualOutputStream=_virtualOutputStream, currentStep=_currentStep, inPatternSetSequencingMode=_inPatternSetSequencingMode, patternSetSequencerSteps=_patternSetSequencerSteps, currentPatSetSeqStep=_currentPatSetSeqStep, patSetSeqViewPlaceMode=_patSetSeqViewPlaceMode, patSetSeq_stepToPlace=_patSetSeq_stepToPlace, activeView=_activeView, isModal=_isModal, shiftButtonHeld=_shiftButtonHeld, velocityEnabled=_velocityEnabled, inNoteChangeMode=_inNoteChangeMode, inChannelChangeMode=_inChannelChangeMode, isActive=_isActive;
+@synthesize patternSets=_patternSets, numberOfSteps=_numberOfSteps, activePatternSet=_activePatternSet, currentStep=_currentStep, inPatternSetSequencingMode=_inPatternSetSequencingMode, patternSetSequencerSteps=_patternSetSequencerSteps, currentPatSetSeqStep=_currentPatSetSeqStep, patSetSeqViewPlaceMode=_patSetSeqViewPlaceMode, patSetSeq_stepToPlace=_patSetSeq_stepToPlace, activeView=_activeView, isModal=_isModal, shiftButtonHeld=_shiftButtonHeld, velocityEnabled=_velocityEnabled, inNoteChangeMode=_inNoteChangeMode, inChannelChangeMode=_inChannelChangeMode, isActive=_isActive;
 
 - (id)init {
 	if(!(self = [super init]))
@@ -82,10 +83,6 @@
 	}
 	self.activePatternSet = [_patternSets objectAtIndex:0];
 	
-	//
-	// Create a virtual output port (for sending notes to software)
-	_virtualOutputStream = [[SMVirtualOutputStream alloc] initWithName:@"sekwenser out" uniqueID:0];
-	
 	// Subscribe to the clock
 	[[[PSClock globalClock] listeners] addObject:self];
 
@@ -98,7 +95,6 @@
 	[_midiMessagesAlive release];
   [_patternSets release];
   [_activePatternSet release];
-  [_virtualOutputStream release];
   [_patternSetSequencerSteps release];
 	
 	[super dealloc];
@@ -151,11 +147,11 @@
 			[_midiMessagesAlive addObject:message];
 		}
 	}
-	[_virtualOutputStream takeMIDIMessages:midiMessages];
+	[SekwenserMIDIOutStream() takeMIDIMessages:midiMessages];
 
 	// If we're in the sequencer view we flash the current step
 	// Unless it's muted, in which case it'll be skipped over
-	if(_activeView == PSSequencerSequencerView) {
+	if(_activeView == PSSequencerSequencerView && [self isKey]) {
 		uint8_t lightCode = kPadOn_codes[_currentStep];
 		uint8_t lightState = kPad_shortOneshot_code+0x02; // add 2 to make the flash slightly longer
 		[[PSPadKontrol sharedPadKontrol] controlLight:&lightCode state:&lightState];
@@ -183,6 +179,10 @@
 }
 
 #pragma mark -
+- (void)didBecomeKey
+{
+    [[PSPadKontrol sharedPadKontrol] setLEDString:"SEQ" blink:NO];
+}
 - (void)padPressed:(PSPadKontrolEvent *)event {
     // If this is positive at the end of the block, the lights on the controller will be refreshed
     BOOL updateLights = YES;
@@ -260,11 +260,11 @@
     if(updateLights) [self updateLights];
 }
 - (void)button:(uint8_t)button_code wasPressed:(PSPadKontrolEvent *)event {
-    if(button_code == kSettingBtn_code) {
-        [[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
-        _shiftButtonHeld = YES;
-        [self updateLights];
-    }
+//    if(button_code == kSettingBtn_code) {
+//        [[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOn_code];
+//        _shiftButtonHeld = YES;
+//        [self updateLights];
+//    }
 
     if(!_isModal && !_shiftButtonHeld) {
         // Light the button
@@ -291,32 +291,6 @@
             [self selectView:PSSequencerPatternCopyView];
             _isModal = YES;
         }
-        else {
-            // Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
-            uint8_t buttonCh = 5;
-            if(button_code == kXBtn_code)
-                [self transmitCC:16 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kYBtn_code)
-                [self transmitCC:17 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kPedalBtn_code)
-                [self transmitCC:18 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kNoteCCBtn_code)
-                [self transmitCC:19 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kMidiCHBtn_code)
-                [self transmitCC:20 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kSWTypeBtn_code)
-                [self transmitCC:21 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kRelValBtn_code)
-                [self transmitCC:22 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kVelocityBtn_code)
-                [self transmitCC:23 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kPortBtn_code)
-                [self transmitCC:24 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kKnobAssignOneBtn_code)
-                [self transmitCC:25 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-            if(button_code == kKnobAssignTwoBtn_code)
-                [self transmitCC:26 channel:buttonCh value:BUTTON_ON_CC_VALUE];
-        }
     }
     // Shift mode (less often used functions)
     // In shift mode we only light the button if it has a function
@@ -335,9 +309,7 @@
         }
     }
 }
-- (void)buttonReleased:(PSPadKontrolEvent *)event {
-    uint8_t button_code = event.affected_entity_code;
-
+- (void)button:(uint8_t)button_code wasReleased:(PSPadKontrolEvent *)event {
     // Turn the button back off
     [[PSPadKontrol sharedPadKontrol] controlLight:&button_code state:(uint8_t *)&kPad_lightOff_code];
 
@@ -373,32 +345,6 @@
         _currentPatSetSeqStep = 0;
         [self updateLights];
     }
-    else {
-        // Buttons not used by the sequencer transmit MIDI CC and don't care about modality/other buttons
-        uint8_t buttonCh = 5;
-        if(button_code == kXBtn_code)
-            [self transmitCC:16 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kYBtn_code)
-            [self transmitCC:17 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kPedalBtn_code)
-            [self transmitCC:18 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kNoteCCBtn_code)
-            [self transmitCC:19 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kMidiCHBtn_code)
-            [self transmitCC:20 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kSWTypeBtn_code)
-            [self transmitCC:21 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kRelValBtn_code)
-            [self transmitCC:22 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kVelocityBtn_code)
-            [self transmitCC:23 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kPortBtn_code)
-            [self transmitCC:24 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kKnobAssignOneBtn_code)
-            [self transmitCC:25 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-        else if(button_code == kKnobAssignTwoBtn_code)
-            [self transmitCC:26 channel:buttonCh value:BUTTON_OFF_CC_VALUE];
-    }
 }
 
 - (void)encoderTurned:(PSPadKontrolEvent *)event direction:(uint8_t)direction {
@@ -418,31 +364,10 @@
     }
     else {
         if(direction == kEncoderDirectionLeft)
-            [self transmitCC:32 channel:5 value:127];
+            TransmitCC(32, 5, 127);
         else if(direction == kEncoderDirectionRight)
-            [self transmitCC:33 channel:5 value:127];		
+            TransmitCC(33, 5, 127);		
     }
-}
-
-- (void)knobTurned:(PSPadKontrolEvent *)event value:(uint8_t)value {
-    uint8_t ccCode;
-    if(event.affected_entity_code == kKnobOne_code)
-        ccCode = 27;
-    else if(event.affected_entity_code == kKnobTwo_code)
-        ccCode = 28;
-    else
-        NSAssert(NO, @"Invalid knob code");
-    [self transmitCC:ccCode channel:5 value:value];
-}
-- (void)xyPadPressed {
-    [self transmitCC:29 channel:5 value:127];
-}
-- (void)xyPadReleased {
-    [self transmitCC:29 channel:5 value:0];
-}
-- (void)xyPadMoved:(PSPadKontrolEvent *)event x:(uint8_t)x y:(uint8_t)y {
-    [self transmitCC:30 channel:5 value:x];
-    [self transmitCC:31 channel:5 value:y];
 }
 
 - (void)padKontrolReady {
@@ -583,15 +508,7 @@
 - (void)takeMIDIMessages:(NSArray *)messages {
 	// We don't really receive anything except SysEx's
 }
-- (void)transmitCC:(uint8_t)ccNumber channel:(uint8_t)channel value:(uint8_t)value {
-	uint8_t data[2] = { ccNumber, value };
-	SMVoiceMessage *message = [SMVoiceMessage voiceMessageWithTimeStamp:SMGetCurrentHostTime()
-																													 statusByte:SMVoiceMessageStatusControl
-																																 data:data
-																															 length:sizeof(uint8_t)*2];
-	[message setChannel:channel];
-	[_virtualOutputStream takeMIDIMessages:[NSArray arrayWithObject:message]];
-}
+
 #pragma mark -
 - (void)clockPulseHappened:(PSClock *)clock {
 	[self performStep];

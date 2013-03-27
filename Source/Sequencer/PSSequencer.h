@@ -71,9 +71,6 @@ typedef enum
 	NSMutableArray *_patternSets;
 	PSPatternSet *_activePatternSet;
 		
-	// MIDI interface
-	SMVirtualOutputStream *_virtualOutputStream;
-	
 	// For copying pattern sets
 	BOOL _performingCopy;
 	NSUInteger _currentCopySource;
@@ -118,8 +115,6 @@ typedef enum
 
 @property(readwrite, assign) BOOL inNoteChangeMode;
 @property(readwrite, assign) BOOL inChannelChangeMode;
-
-@property(readwrite, retain) SMVirtualOutputStream *virtualOutputStream;
 
 @property(readwrite, assign) BOOL shiftButtonHeld;
 @property(readwrite, assign) BOOL velocityEnabled;

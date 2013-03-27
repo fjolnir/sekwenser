@@ -40,9 +40,28 @@
 #import "PSPadKontrolEvent.h"
 
 #import "PSSequencer.h"
+#import "PSPadView.h"
 #import "PSPadKontrol.h"
 
 #define LAYOUT_DIR_PATH [@"~/Documents/sekwenser layouts" stringByExpandingTildeInPath]
+
+SMVirtualOutputStream *SekwenserMIDIOutStream()
+{
+    static SMVirtualOutputStream *outputStream;
+    if(!outputStream)
+        outputStream = [[SMVirtualOutputStream alloc] initWithName:@"sekwenser out" uniqueID:0];
+    return outputStream;
+}
+
+void TransmitCC(uint8_t ccNumber, uint8_t channel, uint8_t value) {
+	uint8_t data[2] = { ccNumber, value };
+	SMVoiceMessage *message = [SMVoiceMessage voiceMessageWithTimeStamp:SMGetCurrentHostTime()
+                                                             statusByte:SMVoiceMessageStatusControl
+                                                                   data:data
+                                                                 length:sizeof(data)];
+	[message setChannel:channel];
+	[SekwenserMIDIOutStream() takeMIDIMessages:[NSArray arrayWithObject:message]];
+}
 
 @implementation SekwenserAppDelegate
 @synthesize window=_window, savedLayouts=_savedLayouts, layoutListTable=_layoutListTable;
@@ -66,6 +85,7 @@
 	[[PSPadKontrol sharedPadKontrol] enterNativeMode];
     _sequencer = [PSSequencer new];
 	[_sequencer makeKey];
+    _padView = [PSPadView new];
 
 	[self updateLayoutList];
 	[self refreshMidiSources:nil];
@@ -86,15 +106,45 @@
 
 // Mode selektor
 - (BOOL)padKontrolEventReceived:(PSPadKontrolEvent *)event fromPadKontrol:(PSPadKontrol *)padKontrol {
-    if(event.type == PSPadKontrolButtonReleaseEventType && event.affected_entity_code == kSettingBtn_code) {
-        if([_sequencer isKey]) {
-            [_sequencer resignKey];
+    if(event.type == PSPadKontrolButtonReleaseEventType || event.type == PSPadKontrolButtonPressEventType) {
+        if(event.type == PSPadKontrolButtonReleaseEventType && event.affected_entity_code == kSettingBtn_code) {
             [[PSPadKontrol sharedPadKontrol] resetAllLights];
-        } else {
-            [_sequencer makeKey];
+            if([_sequencer isKey]) {
+                [_padView makeKey];
+            } else {
+                [_sequencer makeKey];
+            }
+            return NO;
+        } else if(event.affected_entity_code != kSettingBtn_code) {
+            uint8_t button_code = event.affected_entity_code;
+            uint8_t val = event.type == PSPadKontrolButtonReleaseEventType ? 0 : 127;
+            TransmitCC(button_code - kSceneBtn_code + 16, 5, val);
+            [[PSPadKontrol sharedPadKontrol] controlLight:&button_code
+                                                    state:val == 127 ? &kPad_lightOn_code
+                                                                     : &kPad_lightOff_code];
         }
+    } else if(event.type == PSPadKontrolKnobTurnEventType) {
+        uint8_t ccCode;
+        if(event.affected_entity_code == kKnobOne_code)
+            ccCode = 27;
+        else if(event.affected_entity_code == kKnobTwo_code)
+            ccCode = 28;
+        else
+            NSAssert(NO, @"Invalid knob code");
+        TransmitCC(ccCode, 5, *event.values);
+        return NO;
+    } else if(event.type == PSPadKontrolXYPadPressEventType) {
+        TransmitCC(29, 5, 127);
+        return NO;
+    } else if(event.type == PSPadKontrolXYPadReleaseEventType) {
+        TransmitCC(29, 5, 0);
+        return NO;
+    } else if(event.type == PSPadKontrolXYPadMoveEventType) {
+        TransmitCC(30, 5, *event.values);
+        TransmitCC(31, 5, *(event.values+1));
         return NO;
     }
+    
     return YES;
 }
 

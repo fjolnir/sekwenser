@@ -20,11 +20,20 @@ static PSPadKontrolView *_KeyView;
     [_KeyView resignKey];
     [[[PSPadKontrol sharedPadKontrol] eventListeners] addObject:self];
     _KeyView = self;
+    [self didBecomeKey];
     [self updateLights];
 }
 - (void)resignKey {
    [[[PSPadKontrol sharedPadKontrol] eventListeners] removeObject:self];
    _KeyView = nil;
+    [self didResignKey];
+}
+
+- (void)didBecomeKey {
+	// Functionality implemented in subclasses
+}
+- (void)didResignKey {
+	// Functionality implemented in subclasses
 }
 
 - (id)init
@@ -50,7 +59,7 @@ static PSPadKontrolView *_KeyView;
             [self button:event.affected_entity_code wasPressed:event];
             break;
         case PSPadKontrolButtonReleaseEventType:
-            [self buttonReleased:event];
+            [self button:event.affected_entity_code wasReleased:event];
             break;
         case PSPadKontrolEncoderTurnEventType:
             [self encoderTurned:event direction:*event.values];
@@ -94,7 +103,7 @@ static PSPadKontrolView *_KeyView;
 - (void)button:(uint8_t)button wasPressed:(PSPadKontrolEvent *)event {
 	// Functionality implemented in subclasses
 }
-- (void)buttonReleased:(PSPadKontrolEvent *)event {
+- (void)button:(uint8_t)button wasReleased:(PSPadKontrolEvent *)event {
 	// Functionality implemented in subclasses
 }
 

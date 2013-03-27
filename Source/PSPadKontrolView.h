@@ -22,6 +22,9 @@
 - (void)makeKey;
 - (void)resignKey;
 
+- (void)didBecomeKey;
+- (void)didResignKey;
+
 - (void)padKontrolReady;
 
 - (void)updateLights;
@@ -31,7 +34,7 @@
 - (void)padReleased:(PSPadKontrolEvent *)event;
 
 - (void)button:(uint8_t)button wasPressed:(PSPadKontrolEvent *)event;
-- (void)buttonReleased:(PSPadKontrolEvent *)event;
+- (void)button:(uint8_t)button wasReleased:(PSPadKontrolEvent *)event;
 
 - (void)knobTurned:(PSPadKontrolEvent *)event value:(uint8_t)value;
 - (void)encoderTurned:(PSPadKontrolEvent *)event direction:(uint8_t)direction;

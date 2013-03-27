@@ -35,7 +35,10 @@
 #import <Cocoa/Cocoa.h>
 #import "PSPadKontrolEventListener.h"
 
-@class PSPadKontrol, PSSequencer;
+@class PSPadKontrol, PSSequencer, PSPadView, SMVirtualOutputStream;
+
+SMVirtualOutputStream *SekwenserMIDIOutStream();
+void TransmitCC(uint8_t ccNumber, uint8_t channel, uint8_t value);
 
 @interface SekwenserAppDelegate : NSObject <NSApplicationDelegate, NSTableViewDataSource, PSPadKontrolEventListener> {
 	NSWindow *_window;
@@ -46,6 +49,7 @@
 	IBOutlet NSTableView *_layoutListTable;
 
     PSSequencer *_sequencer;
+    PSPadView *_padView;
 }
 
 @property(assign) IBOutlet NSWindow *window;
