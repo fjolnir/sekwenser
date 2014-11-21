@@ -14,6 +14,7 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		C73428BF1701E50700E21B15 /* PSPadView.m in Sources */ = {isa = PBXBuildFile; fileRef = C73428BE1701E50700E21B15 /* PSPadView.m */; };
 		C76FD9001A1F91CA0054C25D /* SnoizeMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C76FD8F91A1F91AF0054C25D /* SnoizeMIDI.framework */; };
+		C76FD9021A1F97210054C25D /* SnoizeMIDI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = C76FD8F91A1F91AF0054C25D /* SnoizeMIDI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C7805D72127C55EC007E3912 /* PSPadKontrolView.m in Sources */ = {isa = PBXBuildFile; fileRef = C7805D71127C55EC007E3912 /* PSPadKontrolView.m */; };
 		C7BFF2DC127D6BE30028841F /* README in Resources */ = {isa = PBXBuildFile; fileRef = C7BFF2DB127D6BE30028841F /* README */; };
 		C7D041CF1260718100503FD6 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D041CE1260718100503FD6 /* CoreMIDI.framework */; };
@@ -69,6 +70,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				C76FD9021A1F97210054C25D /* SnoizeMIDI.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
