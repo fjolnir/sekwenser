@@ -13,11 +13,10 @@
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		C73428BF1701E50700E21B15 /* PSPadView.m in Sources */ = {isa = PBXBuildFile; fileRef = C73428BE1701E50700E21B15 /* PSPadView.m */; };
+		C76FD9001A1F91CA0054C25D /* SnoizeMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C76FD8F91A1F91AF0054C25D /* SnoizeMIDI.framework */; };
 		C7805D72127C55EC007E3912 /* PSPadKontrolView.m in Sources */ = {isa = PBXBuildFile; fileRef = C7805D71127C55EC007E3912 /* PSPadKontrolView.m */; };
 		C7BFF2DC127D6BE30028841F /* README in Resources */ = {isa = PBXBuildFile; fileRef = C7BFF2DB127D6BE30028841F /* README */; };
 		C7D041CF1260718100503FD6 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D041CE1260718100503FD6 /* CoreMIDI.framework */; };
-		C7D041D11260718B00503FD6 /* SnoizeMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */; };
-		C7D041FB126071CF00503FD6 /* SnoizeMIDI.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */; };
 		C7D0421B1260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D042161260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m */; };
 		C7D0421C1260725600503FD6 /* SSECombinationOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D042181260725600503FD6 /* SSECombinationOutputStream.m */; };
 		C7D0421D1260725600503FD6 /* SSEOutputStreamDestination.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D0421A1260725600503FD6 /* SSEOutputStreamDestination.m */; };
@@ -30,8 +29,38 @@
 		C7D048C91261AAEC00503FD6 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */; };
 		C7D04D6012623CED00503FD6 /* PSPadKontrol.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04D5F12623CED00503FD6 /* PSPadKontrol.m */; };
 		C7D04ED412633BDE00503FD6 /* PSPadKontrolEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = C7D04ED312633BDE00503FD6 /* PSPadKontrolEvent.m */; };
-		C7F535E9135A0FFE00D5C9FC /* header.png in Resources */ = {isa = PBXBuildFile; fileRef = C7F535E8135A0FFE00D5C9FC /* header.png */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C76FD8F81A1F91AF0054C25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C76FD8F21A1F91AE0054C25D /* SnoizeMIDI.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8DC2EF5B0486A6940098B216;
+			remoteInfo = SnoizeMIDI;
+		};
+		C76FD8FA1A1F91AF0054C25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C76FD8F21A1F91AE0054C25D /* SnoizeMIDI.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A53DDB97148F4219006D2FFD;
+			remoteInfo = SnoizeMIDIiOS;
+		};
+		C76FD8FC1A1F91AF0054C25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C76FD8F21A1F91AE0054C25D /* SnoizeMIDI.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = A581997216AF687400325CF3;
+			remoteInfo = SnoizeMIDIOSX;
+		};
+		C76FD8FE1A1F91C70054C25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C76FD8F21A1F91AE0054C25D /* SnoizeMIDI.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
+			remoteInfo = SnoizeMIDI;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		C7D041FA126071C200503FD6 /* Copy Frameworks */ = {
@@ -40,7 +69,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				C7D041FB126071CF00503FD6 /* SnoizeMIDI.framework in Copy Frameworks */,
 			);
 			name = "Copy Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,11 +90,11 @@
 		8D1107320486CEB800E47090 /* sekwenser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sekwenser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C73428BD1701E50600E21B15 /* PSPadView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadView.h; sourceTree = "<group>"; };
 		C73428BE1701E50700E21B15 /* PSPadView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPadView.m; sourceTree = "<group>"; };
+		C76FD8F21A1F91AE0054C25D /* SnoizeMIDI.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SnoizeMIDI.xcodeproj; path = SnoizeMIDI/SnoizeMIDI.xcodeproj; sourceTree = SOURCE_ROOT; };
 		C7805D70127C55EC007E3912 /* PSPadKontrolView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadKontrolView.h; sourceTree = "<group>"; };
 		C7805D71127C55EC007E3912 /* PSPadKontrolView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPadKontrolView.m; sourceTree = "<group>"; };
 		C7BFF2DB127D6BE30028841F /* README */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
 		C7D041CE1260718100503FD6 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = System/Library/Frameworks/CoreMIDI.framework; sourceTree = SDKROOT; };
-		C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SnoizeMIDI.framework; sourceTree = "<group>"; };
 		C7D042131260725600503FD6 /* PadKontrolConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PadKontrolConstants.h; sourceTree = "<group>"; };
 		C7D042151260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SMDestinationEndpoint-SSEOutputStreamDestination.h"; sourceTree = "<group>"; };
 		C7D042161260725600503FD6 /* SMDestinationEndpoint-SSEOutputStreamDestination.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "SMDestinationEndpoint-SSEOutputStreamDestination.m"; sourceTree = "<group>"; };
@@ -92,7 +120,6 @@
 		C7D04ED212633BDE00503FD6 /* PSPadKontrolEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadKontrolEvent.h; sourceTree = "<group>"; };
 		C7D04ED312633BDE00503FD6 /* PSPadKontrolEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PSPadKontrolEvent.m; sourceTree = "<group>"; };
 		C7D04F451263495000503FD6 /* PSPadKontrolEventListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PSPadKontrolEventListener.h; sourceTree = "<group>"; };
-		C7F535E8135A0FFE00D5C9FC /* header.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = header.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,9 +127,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C76FD9001A1F91CA0054C25D /* SnoizeMIDI.framework in Frameworks */,
 				8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */,
 				C7D041CF1260718100503FD6 /* CoreMIDI.framework in Frameworks */,
-				C7D041D11260718B00503FD6 /* SnoizeMIDI.framework in Frameworks */,
 				C7D048C91261AAEC00503FD6 /* AudioToolbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -113,7 +140,6 @@
 		1058C7A0FEA54F0111CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C7D041D01260718B00503FD6 /* SnoizeMIDI.framework */,
 				C7D041CE1260718100503FD6 /* CoreMIDI.framework */,
 				C7D048C81261AAEC00503FD6 /* AudioToolbox.framework */,
 				1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */,
@@ -164,7 +190,6 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				C7F535E8135A0FFE00D5C9FC /* header.png */,
 				8D1107310486CEB800E47090 /* Sekwenser-Info.plist */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 				1DDD58140DA1D0A300B32029 /* MainMenu.xib */,
@@ -179,6 +204,16 @@
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C76FD8F31A1F91AE0054C25D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C76FD8F91A1F91AF0054C25D /* SnoizeMIDI.framework */,
+				C76FD8FB1A1F91AF0054C25D /* libSnoizeMIDIiOS.a */,
+				C76FD8FD1A1F91AF0054C25D /* libSnoizeMIDI.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		C7D042121260725600503FD6 /* Source */ = {
@@ -198,6 +233,7 @@
 				C73428BD1701E50600E21B15 /* PSPadView.h */,
 				C73428BE1701E50700E21B15 /* PSPadView.m */,
 				C7D043321260826300503FD6 /* Sequencer */,
+				C76FD8F21A1F91AE0054C25D /* SnoizeMIDI.xcodeproj */,
 				C7D042141260725600503FD6 /* SnoizeMIDI SysEx exts */,
 			);
 			path = Source;
@@ -249,6 +285,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				C76FD8FF1A1F91C70054C25D /* PBXTargetDependency */,
 			);
 			name = sekwenser;
 			productInstallPath = "$(HOME)/Applications";
@@ -261,6 +298,8 @@
 /* Begin PBXProject section */
 		29B97313FDCFA39411CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Sekwenser" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
@@ -273,12 +312,42 @@
 			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* Meedee */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = C76FD8F31A1F91AE0054C25D /* Products */;
+					ProjectRef = C76FD8F21A1F91AE0054C25D /* SnoizeMIDI.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				8D1107260486CEB800E47090 /* sekwenser */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		C76FD8F91A1F91AF0054C25D /* SnoizeMIDI.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = SnoizeMIDI.framework;
+			remoteRef = C76FD8F81A1F91AF0054C25D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C76FD8FB1A1F91AF0054C25D /* libSnoizeMIDIiOS.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSnoizeMIDIiOS.a;
+			remoteRef = C76FD8FA1A1F91AF0054C25D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		C76FD8FD1A1F91AF0054C25D /* libSnoizeMIDI.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libSnoizeMIDI.a;
+			remoteRef = C76FD8FC1A1F91AF0054C25D /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		8D1107290486CEB800E47090 /* Resources */ = {
@@ -288,7 +357,6 @@
 				8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */,
 				1DDD58160DA1D0A300B32029 /* MainMenu.xib in Resources */,
 				C7BFF2DC127D6BE30028841F /* README in Resources */,
-				C7F535E9135A0FFE00D5C9FC /* header.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,6 +386,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C76FD8FF1A1F91C70054C25D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SnoizeMIDI;
+			targetProxy = C76FD8FE1A1F91C70054C25D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		089C165CFE840E0CC02AAC07 /* InfoPlist.strings */ = {
